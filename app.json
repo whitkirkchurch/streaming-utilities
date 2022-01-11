@@ -1,0 +1,22 @@
+{
+    "env": {
+        "AIRTABLE_API_KEY": {
+            "description": "The Airtable API key."
+        },
+        "AIRTABLE_BASE_ID": {
+            "description": "The Airtable base to sync with."
+        },
+        "AIRTABLE_SERVICES_TABLE_ID": {
+            "description": "The Table ID of the Services table in Airtable."
+        },
+        "MAILGUN_DOMAIN": {
+            "description": "The Mailgun domain to send emails from."
+        },
+        "MAILGUN_API_KEY": {
+            "description": "The Mailgun API key."
+        },
+        "MAIL_TO_ADDRESS": {
+            "description": "Where should summary emails be sent?"
+        }
+    }
+}

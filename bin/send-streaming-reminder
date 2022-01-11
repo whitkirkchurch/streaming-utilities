@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+
+import os
+import requests
+
+import click
+
+import datetime
+
+from pyairtable import Table, utils
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
+AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
+AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
+
+MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
+MAILGUN_API_KEY = os.environ["MAILGUN_API_KEY"]
+MAIL_TO_ADDRESS = os.environ["MAIL_TO_ADDRESS"]
+
+
+@click.command()
+@click.option("--send-email/--dry-run", default=False)
+def send_report(send_email):
+
+    click.echo(click.style("Getting services from Airtable…", fg="blue"))
+
+    services_table = Table(
+        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
+    )
+
+    services = services_table.all(
+        formula="{Date & time} >= TODAY()", sort=["Date & time"]
+    )
+
+    click.echo(click.style("Preparing email content…", fg="blue"))
+
+    now = datetime.datetime.now()
+
+    email_variables = {
+        "services_this_week": [],
+        "services_later": [],
+        "send_time_string": now.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    next_week = datetime.datetime.today() + datetime.timedelta(weeks=1)
+
+    for service in services:
+
+        service_datetime = utils.datetime_from_iso_str(service["fields"]["Date & time"])
+
+        if service["fields"].get("Technician"):
+            technician_name = service["fields"]["Technician"]["name"]
+        else:
+            technician_name = None
+
+        service_data = {
+            "url": "https://airtable.com/{base_id}/{table_id}/{item_id}".format(
+                base_id=AIRTABLE_BASE_ID,
+                table_id=AIRTABLE_SERVICES_TABLE_ID,
+                item_id=service["id"],
+            ),
+            "title": service["fields"]["Name"],
+            "type": service["fields"]["Type"],
+            "datetime": service_datetime.strftime("%A %-d %B %Y at %I.%M %p"),
+            "technician": technician_name,
+        }
+
+        if service_datetime >= next_week:
+            email_variables["services_later"].append(service_data)
+        else:
+            email_variables["services_this_week"].append(service_data)
+
+    click.echo(click.style("Building template…", fg="blue"))
+
+    env = Environment(
+        loader=FileSystemLoader("templates"), autoescape=select_autoescape()
+    )
+
+    template = env.get_template("summary_email.html")
+
+    email_html_content = template.render(email_variables)
+
+    if send_email:
+        click.echo(click.style("Sending summary email…", fg="blue"))
+        requests.post(
+            "https://api.mailgun.net/v3/{domain}/messages".format(
+                domain=MAILGUN_DOMAIN
+            ),
+            auth=("api", MAILGUN_API_KEY),
+            data={
+                "from": "Streaming Services Robot <comms@whitkirkchurch.org.uk>",
+                "to": MAIL_TO_ADDRESS,
+                "subject": "Streaming services summary: {date}".format(
+                    date=now.strftime("%A %-d %B %Y")
+                ),
+                "html": email_html_content,
+            },
+        )
+    else:
+        click.echo(click.style("Dry run; writing HTML to file…", fg="blue"))
+        with open("email.html", "w") as text_file:
+            text_file.write(email_html_content)
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+if __name__ == "__main__":
+    send_report()

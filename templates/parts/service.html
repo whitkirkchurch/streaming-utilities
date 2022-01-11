@@ -1,0 +1,16 @@
+<tr>
+    <td align="center" valign="top">
+
+    <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+        <tr>
+        <td>
+            <h3><a href="{{ service.url }}">{{ service.title }}</a></h3>
+            <p><b>{{ service.type }}<br>
+            {{ service.datetime }}</b></p>
+            <p>{% if service.technician %}Streaming lead: {{ service.technician }}{% else %}<b style="color:red">No technician has been assigned to this service!</b>{% endif %}</p>
+        </td>
+        </tr>
+    </table>
+
+    </td>
+</tr>
