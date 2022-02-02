@@ -21,7 +21,8 @@
     img { border: 0; outline: none; text-decoration: none; }
     table { border-collapse: collapse !important; }
     body { margin: 0 !important; padding: 0 !important; width: 100% !important; font-family: arial; }
-    hr { border: 1px solid #D2D2D2; }
+    hr { border: 2px solid #D2D2D2; }
+    hr.itembreak { border: 1px dashed #D2D2D2; }
     .subtitle { font-size: 1.6em; font-weight: bold; }
 
     /* iOS BLUE LINKS */
@@ -136,6 +137,56 @@
 
           <!-- END SERVICES THIS WEEK -->
 
+          <!-- BEGIN UNDECIDED SERVICES -->
+
+          {% if services_undecided|length %}
+          
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <h2>Services without decision on streaming</h2>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+              <tr>
+                <td align="center" valign="top">
+
+                  <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                    <tr>
+                      <td>
+                          <p>These are services which are in ChurchSuite, but where we haven't yet recorded if the service should be streamed or not.</p>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+              </tr>
+
+              {% for service in services_undecided %}
+                
+                  {% include 'parts/service.html' %}
+
+              {% endfor %}
+
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          {% endif %}
+
+          <!-- END SERVICES UNDECIDED -->
+
           <!-- BEGIN SERVICES LATER -->
 
           {% set services_to_show = 4 %}
@@ -219,7 +270,9 @@
 
                         <ul>
                           <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwC7LfYZ9nf255UW">All upcoming services</a></li>
-                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwJwEvfIVOxQWD1H">All services yet to be assigned a technician</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwXUX7nB2gUqmq9e">All upcoming streaming services</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwYlVpw2QN6E3au4">All services without a stream decision</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwJwEvfIVOxQWD1H">All streaming services yet to be assigned a technician</a></li>
                           <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwSdusaAXXTiXBLM">Calendar view of streaming services</a></li>
                         </ul>
                     </td>
