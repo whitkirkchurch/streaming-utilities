@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import resource
 import requests
 
 import click
@@ -9,6 +10,11 @@ import datetime
 
 from pyairtable import Table, utils
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+import googleapiclient.errors
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -29,6 +35,9 @@ CHURCHSUITE_CATEGORIES_TO_SYNC = [
 MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
 MAILGUN_API_KEY = os.environ["MAILGUN_API_KEY"]
 MAIL_TO_ADDRESS = os.environ["MAIL_TO_ADDRESS"]
+
+GOOGLE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
+GOOGLE_CLIENT_SECRET_FILE = "client_secret_532410402320-mv0adcfbvdulivvlg246dmk9m957k2hq.apps.googleusercontent.com.json"
 
 
 @click.group(chain=True)
@@ -180,6 +189,113 @@ def send_report(send_email):
         click.echo(click.style("Dry run; writing HTML to file…", fg="blue"))
         with open("email.html", "w") as text_file:
             text_file.write(email_html_content)
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+@utilities.command()
+@click.option("--update/--preview", default=False)
+def sync_with_youtube(update):
+
+    click.echo(click.style("Getting services from Airtable…", fg="blue"))
+
+    services_table = Table(
+        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
+    )
+
+    services_to_stream = services_table.all(
+        formula="AND({Date & time} >= TODAY(),{Streaming?} = 'Yes')",
+        sort=["Date & time"],
+    )
+
+    # print(services_to_stream)
+
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+    api_service_name = "youtube"
+    api_version = "v3"
+
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists("token.json"):
+        creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
+            "token.json", GOOGLE_OAUTH_SCOPES
+        )
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
+                GOOGLE_CLIENT_SECRET_FILE, GOOGLE_OAUTH_SCOPES
+            )
+            creds = flow.console
+        # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
+
+    youtube = googleapiclient.discovery.build(
+        api_service_name, api_version, credentials=creds
+    )
+
+    for service in services_to_stream:
+
+        service_datetime = utils.datetime_from_iso_str(service["fields"]["Date & time"])
+
+        service_title_string = "{title}: {date}".format(
+            title=service["fields"]["Liturgical Name"]
+            if service["fields"].get("Liturgical Name")
+            else service["fields"]["Name"],
+            date=service_datetime.strftime("%-d %B %Y"),
+        )
+
+        # This is a hack to force a capital on the first letter of the first word, but leave the rest of the string intact.
+        service_title_string = (
+            service_title_string[:1].upper() + service_title_string[1:]
+        )
+
+        click.echo(service_title_string)
+
+        try:
+
+            resource_body = {
+                "snippet": {
+                    "scheduledStartTime": service["fields"]["Date & time"],
+                    "title": service_title_string,
+                },
+                "status": {"privacyStatus": "public"},
+            }
+
+            if service["fields"].get("YouTube ID"):
+
+                click.echo("YouTube ID found, updating!")
+
+                resource_body["id"] = service["fields"]["YouTube ID"]
+
+                request = youtube.liveBroadcasts().update(
+                    part="snippet,status",
+                    body=resource_body,
+                )
+
+            else:
+
+                click.echo(click.style("No YouTube ID found, creating!", fg="green"))
+
+                request = youtube.liveBroadcasts().insert(
+                    part="snippet,status",
+                    body=resource_body,
+                )
+
+            if update:
+                response = request.execute()
+                services_table.update(service["id"], {"YouTube ID": response["id"]})
+            else:
+                click.echo(click.style("In preview mode, skipping", fg="yellow"))
+
+        except googleapiclient.errors.HttpError as err:
+            print(err)
 
     click.echo(click.style("Done!", fg="green"))
 

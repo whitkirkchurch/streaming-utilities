@@ -19,3 +19,13 @@ Pulls services from Airtable to notify people about, and sends a summary email t
 If you're doing development, you can use the `--dry-run` flag to output the email's HTML to file (`email.html`) instead of sending the email.
 
 `$ bin/send-streaming-reminder send-report --dry-run`
+
+## Sync with YouTube
+
+Push the upcoming services to YouTube. You'll need to authenticate with Google to make this happen.
+
+`$ bin/streaming-utilities sync-with-youtube --update`
+
+### Preview
+
+If you use `--preview` instead of `--update`, the script won't actually hit the YouTube API.

@@ -1,2 +1,4 @@
 .env
 email.html
+client_secret.json
+token.json

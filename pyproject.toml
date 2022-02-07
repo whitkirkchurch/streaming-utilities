@@ -9,6 +9,8 @@ python = "3.8.12"
 pyairtable = "^1.0.0"
 click = "^8.0.3"
 Jinja2 = "^3.0.3"
+google-api-python-client = "^2.36.0"
+google-auth-oauthlib = "^0.4.6"
 
 [tool.poetry.dev-dependencies]
 
