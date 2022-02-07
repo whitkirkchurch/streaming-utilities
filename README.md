@@ -1,15 +1,21 @@
-# St Mary's Church Whitkirk Streaming Summary Robot
+# St Mary's Church Whitkirk Streaming Utilities
 
-A useful tool to make the lives of the service streaming a bit easier.
+A collection of useful utilities which make the lives of our streaming team easier, by automating a bunch of stuff we used to do manually.
+
+## Import from ChurchSuite
+
+Check our upcoming public services list from ChurchSuite (ie events which are in one of the service categories listed in `CHURCHSUITE_CATEGORIES_TO_SYNC`, and which are visible for embedding) and import to Airtable. Creates new or updates where needed.
+
+`$ bin/streaming-utilities import-from-churchsuite`
 
 ## Send summary email
 
 Pulls services from Airtable to notify people about, and sends a summary email to the streaming team. The `--send-email` flag is necessary to actually send an email, otherwise the default behaviour is a dry run (see below).
 
-`$ bin/send-streaming-reminder --send-email`
+`$ bin/streaming-utilities send-report --send-email`
 
 ### Dry run
 
 If you're doing development, you can use the `--dry-run` flag to output the email's HTML to file (`email.html`) instead of sending the email.
 
-`$ bin/send-streaming-reminder --dry-run`
+`$ bin/send-streaming-reminder send-report --dry-run`
