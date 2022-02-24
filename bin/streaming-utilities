@@ -321,13 +321,13 @@ def sync_with_youtube(update):
         # Apply category-specific overrides
 
         if (
-            service["fields"].get("ChurchSuite Category ID")
+            service_object.churchsuite_category_id
             in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
         ):
             print("Overriding service defaults for category")
 
             category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                service["fields"]["ChurchSuite Category ID"]
+                service_object.churchsuite_category_id
             ]
 
             if "default_thumbnail" in category_overrides:
@@ -476,13 +476,13 @@ def sync_with_wordpress(update):
             # Apply category-specific overrides
 
             if (
-                service["fields"].get("ChurchSuite Category ID")
+                service_object.churchsuite_category_id
                 in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
             ):
                 print("Overriding service defaults for category")
 
                 category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                    service["fields"]["ChurchSuite Category ID"]
+                    service_object.churchsuite_category_id
                 ]
 
                 if "default_thumbnail" in category_overrides:

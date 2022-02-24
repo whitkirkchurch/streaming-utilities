@@ -4,6 +4,7 @@ from pyairtable import utils
 
 
 AIRTABLE_MAP = {
+    "churchsuite_category_id": "ChurchSuite Category ID",
     "datetime": "Date & time",
     "fee_payable": "Fee payable?",
     "liturgical_name": "Liturgical name",
@@ -44,6 +45,10 @@ class Service:
     @property
     def technician_field(self):
         return self.airtable_fields.get(AIRTABLE_MAP["technician"])
+
+    @property
+    def churchsuite_category_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_category_id"])
 
     @property
     def datetime(self):
