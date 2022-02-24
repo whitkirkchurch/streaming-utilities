@@ -1,0 +1,777 @@
+#!/usr/bin/env python3
+
+import os
+import requests
+import base64
+import urllib.request
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+
+import botocore
+import boto3
+import click
+
+import datetime
+
+from pyairtable import Table, utils
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+import googleapiclient.errors
+from googleapiclient.http import MediaFileUpload
+
+from service import Service
+
+AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
+AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
+AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
+
+CHURCHSUITE_ACCOUNT = os.environ["CHURCHSUITE_ACCOUNT"]
+
+CHURCHSUITE_CATEGORIES_TO_SYNC = [
+    "1",  # Special service
+    "3",  # Regular service
+    "9",  # Wedding
+    "10",  # Funeral
+    "16",  # Christmas
+    "25",  # Easter
+    "34",  # Choral Evensong
+]
+
+CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
+    "9": {"default_thumbnail": "wedding.jpg"},
+    "10": {"default_thumbnail": "funeral.jpg"},
+    "34": {
+        "default_thumbnail": "evensong.jpg",
+        "default_featured_image_id": "6899",
+        "describe_service_as": "service of Choral Evensong",
+        "show_bcp_reproduction_notice": True,
+    },
+}
+
+MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
+MAILGUN_API_KEY = os.environ["MAILGUN_API_KEY"]
+MAIL_TO_ADDRESS = os.environ["MAIL_TO_ADDRESS"]
+
+YOUTUBE_STREAM_ID = os.environ["YOUTUBE_STREAM_ID"]
+
+GOOGLE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
+GOOGLE_CLIENT_SECRET_FILE = "client_secret.json"
+GOOGLE_CREDENTIALS_FILE = "token.json"
+
+WORDPRESS_BASE_URL = "https://whitkirkchurch.org.uk"
+WORDPRESS_USER = os.environ["WORDPRESS_USER"]
+WORDPRESS_APPLICATION_PASSWORD = os.environ["WORDPRESS_APPLICATION_PASSWORD"]
+
+AWS_S3_BUCKET_NAME = os.environ["AWS_S3_BUCKET_NAME"]
+AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET = os.environ["AWS_SECRET"]
+
+s3 = boto3.resource(
+    "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET
+)
+bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+
+@click.group(chain=True)
+def utilities():
+    pass
+
+
+@utilities.command()
+def import_from_churchsuite():
+
+    click.echo(click.style("Importing from ChurchSuite", fg="blue"))
+
+    click.echo(click.style("Loading events from ChurchSuite…", fg="blue"))
+
+    featured_events_url = (
+        "https://{churchsuite_account_id}.churchsuite.co.uk/embed/calendar/json".format(
+            churchsuite_account_id=CHURCHSUITE_ACCOUNT
+        )
+    )
+
+    params = {"category_ids": ",".join(CHURCHSUITE_CATEGORIES_TO_SYNC)}
+
+    resp = requests.get(url=featured_events_url, params=params)
+    churchsuite_events = resp.json()
+
+    events_to_sync = {}
+
+    for event in churchsuite_events:
+
+        service_url = (
+            "https://{churchsuite_account_id}.churchsuite.co.uk/event/{id}".format(
+                id=event["identifier"], churchsuite_account_id=CHURCHSUITE_ACCOUNT
+            )
+        )
+
+        events_to_sync[service_url] = {
+            "name": event["name"],
+            "datetime": event["datetime_start"],
+            "category": event["category"]["name"],
+            "category_id": event["category"]["id"],
+        }
+
+        if event["images"]:
+            events_to_sync[service_url]["image_url"] = event["images"]["lg"]["url"]
+
+    table = Table(AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID)
+
+    click.echo(click.style("Comparing and synchronising…", fg="blue"))
+
+    for event_sync_identifier, event in events_to_sync.items():
+
+        click.echo(
+            click.style(
+                "Searching for event {event_id}".format(event_id=event_sync_identifier)
+            )
+        )
+
+        existing_event = table.first(
+            formula="{ChurchSuite event} = '" + event_sync_identifier + "'"
+        )
+
+        event_data_blob = {
+            "ChurchSuite event": event_sync_identifier,
+            "Name": event["name"],
+            "Date & time": event["datetime"],
+            "Type": event["category"],
+            "ChurchSuite Category ID": str(event["category_id"]),
+        }
+
+        if "image_url" in event:
+            event_data_blob["ChurchSuite Image"] = [
+                utils.attachment(event["image_url"])
+            ]
+
+        if existing_event:
+            click.echo(click.style("Match found, updating"))
+            table.update(existing_event["id"], event_data_blob)
+        else:
+            click.echo(click.style("Not found, creating a new record!"))
+            table.create(event_data_blob)
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+@utilities.command()
+@click.option("--send-email/--dry-run", default=False)
+def send_report(send_email):
+
+    click.echo(click.style("Sending email report", fg="blue"))
+
+    click.echo(click.style("Getting services from Airtable…", fg="blue"))
+
+    services_table = Table(
+        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
+    )
+
+    services_to_stream = services_table.all(
+        formula="AND({Date & time} >= TODAY(),{Streaming?} = 'Yes')",
+        sort=["Date & time"],
+    )
+
+    services_undecided = services_table.all(
+        formula="AND({Date & time} >= TODAY(),{Streaming?} = '')",
+        sort=["Date & time"],
+    )
+
+    click.echo(click.style("Preparing email content…", fg="blue"))
+
+    now = datetime.datetime.now()
+
+    email_variables = {
+        "services_this_week": [],
+        "services_later": [],
+        "services_undecided": [],
+        "send_time_string": now.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    next_week = datetime.datetime.today() + datetime.timedelta(weeks=1)
+
+    for service in services_to_stream:
+
+        service_datetime = utils.datetime_from_iso_str(service["fields"]["Date & time"])
+
+        service_data = build_service_data_from_service(service)
+
+        if service_datetime >= next_week:
+            email_variables["services_later"].append(service_data)
+        else:
+            email_variables["services_this_week"].append(service_data)
+
+    for service in services_undecided:
+        email_variables["services_undecided"].append(
+            build_service_data_from_service(service)
+        )
+
+    click.echo(click.style("Building template…", fg="blue"))
+
+    env = Environment(
+        loader=FileSystemLoader("templates"), autoescape=select_autoescape()
+    )
+
+    template = env.get_template("summary_email.html")
+
+    email_html_content = template.render(email_variables)
+
+    if send_email:
+        click.echo(click.style("Sending summary email…", fg="blue"))
+        requests.post(
+            "https://api.mailgun.net/v3/{domain}/messages".format(
+                domain=MAILGUN_DOMAIN
+            ),
+            auth=("api", MAILGUN_API_KEY),
+            data={
+                "from": "Streaming Services Robot <comms@whitkirkchurch.org.uk>",
+                "to": MAIL_TO_ADDRESS,
+                "subject": "Streaming services summary: {date}".format(
+                    date=now.strftime("%A %-d %B %Y")
+                ),
+                "html": email_html_content,
+            },
+        )
+    else:
+        click.echo(click.style("Dry run; writing HTML to file…", fg="blue"))
+        with open("email.html", "w") as text_file:
+            text_file.write(email_html_content)
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+@utilities.command()
+@click.option("--update/--preview", default=False)
+def sync_with_youtube(update):
+
+    click.echo(click.style("Synchronising with YouTube", fg="blue"))
+
+    services_table = Table(
+        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
+    )
+
+    services_to_stream = get_upcoming_streaming_services(services_table)
+
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+    api_service_name = "youtube"
+    api_version = "v3"
+
+    creds = None
+    # The file GOOGLE_CREDENTIALS_FILE stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
+
+    try:
+        bucket.download_file(GOOGLE_CREDENTIALS_FILE, GOOGLE_CREDENTIALS_FILE)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            click.echo(click.style("Could not find credential file", fg="red"))
+        else:
+            # Something else has gone wrong.
+            raise
+    else:
+        click.echo(click.style("Loaded credential file", fg="green"))
+        creds = google.oauth2.credentials.Credentials.from_authorized_user_file(
+            GOOGLE_CREDENTIALS_FILE, GOOGLE_OAUTH_SCOPES
+        )
+
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(google.auth.transport.requests.Request())
+        else:
+            bucket.download_file(GOOGLE_CLIENT_SECRET_FILE, GOOGLE_CLIENT_SECRET_FILE)
+            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
+                GOOGLE_CLIENT_SECRET_FILE, GOOGLE_OAUTH_SCOPES
+            )
+            creds = flow.run_console()
+        # Save the credentials for the next run
+        with open(GOOGLE_CREDENTIALS_FILE, "w") as token:
+            token.write(creds.to_json())
+
+    # Send the new/updated token back to S3
+    bucket.upload_file(GOOGLE_CREDENTIALS_FILE, GOOGLE_CREDENTIALS_FILE)
+
+    youtube = googleapiclient.discovery.build(
+        api_service_name, api_version, credentials=creds
+    )
+
+    for service in services_to_stream:
+
+        service_object = Service(service)
+
+        click.echo(service_object.title_string_with_date)
+
+        # Establish service defaults
+
+        service_image = None
+
+        # Apply category-specific overrides
+
+        if (
+            service["fields"].get("ChurchSuite Category ID")
+            in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
+        ):
+            print("Overriding service defaults for category")
+
+            category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
+                service["fields"]["ChurchSuite Category ID"]
+            ]
+
+            if "default_thumbnail" in category_overrides:
+                service_image = "images/default_thumbnails/{}".format(
+                    category_overrides["default_thumbnail"]
+                )
+
+            if "describe_service_as" in category_overrides:
+                describe_service_as = category_overrides["describe_service_as"]
+
+        if "ChurchSuite Image" in service["fields"]:
+            click.echo(click.style("Service-specific image found...", fg="blue"))
+            image_data = service["fields"]["ChurchSuite Image"][0]
+            image_url = image_data["url"]
+            image_save_location = "images/service_specific/{}".format(
+                image_data["filename"]
+            )
+            urllib.request.urlretrieve(image_url, image_save_location)
+
+            service_image = image_save_location
+
+        # Actually build objects and perform updates
+
+        # Build up the description
+
+        order_of_service_url = "https://whitkirkchurch.org.uk/oos/{slug}".format(
+            slug=service["fields"]["Slug"]
+        )
+
+        youtube_description = (
+            service_object.description
+            + "\r\n\r\n"
+            + "View the order of service online at {oos_url}".format(
+                oos_url=order_of_service_url
+            )
+        )
+
+        try:
+
+            resource_body = {
+                "snippet": {
+                    "scheduledStartTime": service["fields"]["Date & time"],
+                    "title": service_object.title_string_with_date,
+                    "description": youtube_description,
+                },
+                "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+            }
+
+            if service["fields"].get("YouTube ID"):
+
+                click.echo("YouTube ID found, updating!")
+
+                resource_body["id"] = service["fields"]["YouTube ID"]
+
+                request = youtube.liveBroadcasts().update(
+                    part="snippet,status",
+                    body=resource_body,
+                )
+
+            else:
+
+                click.echo(click.style("No YouTube ID found, creating!", fg="green"))
+
+                request = youtube.liveBroadcasts().insert(
+                    part="snippet,status",
+                    body=resource_body,
+                )
+
+            if update:
+                response = request.execute()
+                services_table.update(service["id"], {"YouTube ID": response["id"]})
+
+                request = youtube.liveBroadcasts().bind(
+                    part="id",
+                    id=response["id"],
+                    streamId=YOUTUBE_STREAM_ID,
+                )
+
+                response = request.execute()
+
+            else:
+                click.echo(
+                    click.style(
+                        "In preview mode, skipping broadcast create/update", fg="yellow"
+                    )
+                )
+
+            if service_image:
+
+                if update:
+                    click.echo("Updating YouTube thumbnail...")
+                    thumb_request = youtube.thumbnails().set(
+                        videoId=response["id"],
+                        media_body=MediaFileUpload(service_image),
+                    )
+                    thumb_request.execute()
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping thumbnail", fg="yellow")
+                    )
+
+        except googleapiclient.errors.HttpError as err:
+            print(err)
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+@utilities.command()
+@click.option("--update/--preview", default=False)
+def sync_with_wordpress(update):
+
+    click.echo(click.style("Synchronising with Wordpress", fg="blue"))
+
+    click.echo(click.style("Getting services from Airtable…", fg="blue"))
+
+    services_table = Table(
+        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
+    )
+
+    services_to_stream = get_upcoming_streaming_services(services_table)
+
+    url = "{base_url}/wp-json/wp/v2/whitkirk_oos".format(base_url=WORDPRESS_BASE_URL)
+    media_url = "{base_url}/wp-json/wp/v2/media".format(base_url=WORDPRESS_BASE_URL)
+    podcast_url = "{base_url}/wp-json/wp/v2/podcast".format(base_url=WORDPRESS_BASE_URL)
+    user = WORDPRESS_USER
+    password = WORDPRESS_APPLICATION_PASSWORD
+    credentials = user + ":" + password
+    token = base64.b64encode(credentials.encode())
+    header = {"Authorization": "Basic " + token.decode("utf-8")}
+
+    for service in services_to_stream:
+
+        service_object = Service(service)
+
+        # We only generate OOS for public streams
+        if "Stream public?" in service["fields"]:
+
+            click.echo(service_object.title_string)
+
+            # Establish service defaults
+
+            service_image = None
+            show_bcp_reproduction_notice = False
+            featured_image_id = None
+
+            # Apply category-specific overrides
+
+            if (
+                service["fields"].get("ChurchSuite Category ID")
+                in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
+            ):
+                print("Overriding service defaults for category")
+
+                category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
+                    service["fields"]["ChurchSuite Category ID"]
+                ]
+
+                if "default_thumbnail" in category_overrides:
+                    service_image = "images/default_thumbnails/{}".format(
+                        category_overrides["default_thumbnail"]
+                    )
+
+                if "default_featured_image_id" in category_overrides:
+                    featured_image_id = category_overrides["default_featured_image_id"]
+
+                if "show_bcp_reproduction_notice" in category_overrides:
+                    show_bcp_reproduction_notice = category_overrides[
+                        "show_bcp_reproduction_notice"
+                    ]
+
+            resource_body = {
+                "title": service_object.title_string,
+                "slug": service_object.slug,
+                "date": (
+                    service_object.datetime - datetime.timedelta(days=1)
+                ).isoformat(),
+                "acf": {
+                    "datetime": service_object.datetime.isoformat(),
+                    "physical": True,
+                    "show_bcp_reproduction_notice": show_bcp_reproduction_notice,
+                },
+            }
+
+            if "YouTube ID" in service["fields"]:
+                resource_body["acf"]["youtube"] = service["fields"]["YouTube ID"]
+                resource_body["acf"]["streamed"] = True
+
+            if "Wordpress featured image ID" in service["fields"]:
+                featured_image_id = service["fields"]["Wordpress featured image ID"]
+
+            if "ChurchSuite Image" in service["fields"]:
+                click.echo(click.style("Service-specific image found...", fg="blue"))
+                image_data = service["fields"]["ChurchSuite Image"][0]
+                image_url = image_data["url"]
+                image_save_location = "images/service_specific/{}".format(
+                    image_data["filename"]
+                )
+                urllib.request.urlretrieve(image_url, image_save_location)
+
+                service_image = image_save_location
+
+            media_resource_body = {
+                "title": "Featured image for {}".format(
+                    service_object.title_string_with_date
+                ),
+            }
+
+            if "Order of Service ID" in service["fields"]:
+                media_resource_body["post"] = service["fields"]["Order of Service ID"]
+
+            if featured_image_id:
+
+                click.echo("Featured image known!")
+
+                # If this is a service-specific image, it might have changed. Compare!
+                if (
+                    "ChurchSuite Image" in service["fields"]
+                    and "Last uploaded image name" in service["fields"]
+                ):
+
+                    click.echo("Featured image is service-specific")
+
+                    # Get the resource metadata, so we can compare the filename
+
+                    last_uploaded_file = service["fields"]["Last uploaded image name"]
+                    image_filename_from_airtable = service["fields"][
+                        "ChurchSuite Image"
+                    ][0]["filename"]
+
+                    if last_uploaded_file == image_filename_from_airtable:
+                        # This is the same image idenfitier, so just poke the metadata
+                        if update:
+                            requests.post(
+                                media_url + "/{}".format(featured_image_id),
+                                headers=header,
+                                json=media_resource_body,
+                            )
+                        else:
+                            click.echo(
+                                click.style(
+                                    "In preview mode, skipping metadata update",
+                                    fg="yellow",
+                                )
+                            )
+                    else:
+                        # This is a different image, nuke the old one and replace
+
+                        click.echo("Image has changed, replacing")
+
+                        fileName = os.path.basename(service_image)
+                        media_resource_body["file"] = (
+                            fileName,
+                            open(service_image, "rb"),
+                            "image/jpg",
+                        )
+
+                        multipart_data = MultipartEncoder(media_resource_body)
+
+                        if update:
+                            requests.delete(
+                                media_url + "/{}".format(featured_image_id),
+                                headers=header,
+                            )
+                            response = requests.post(
+                                media_url,
+                                data=multipart_data,
+                                headers={"Content-Type": multipart_data.content_type},
+                                auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
+                            ).json()
+                            services_table.update(
+                                service["id"],
+                                {
+                                    "Wordpress featured image ID": str(response["id"]),
+                                    "Last uploaded image name": last_uploaded_file,
+                                },
+                            )
+                            resource_body["featured_media"] = response["id"]
+                        else:
+                            click.echo(
+                                click.style(
+                                    "In preview mode, skipping upload", fg="yellow"
+                                )
+                            )
+
+                resource_body["featured_media"] = int(featured_image_id)
+
+            elif service_image:
+
+                click.echo("No featured image ID known, uploading!")
+
+                fileName = os.path.basename(service_image)
+                media_resource_body["file"] = (
+                    fileName,
+                    open(service_image, "rb"),
+                    "image/jpg",
+                )
+
+                media_resource_body["slug"] = service["fields"]["ChurchSuite Image"][0][
+                    "filename"
+                ].split(".")[0]
+
+                multipart_data = MultipartEncoder(media_resource_body)
+
+                if update:
+                    response = requests.post(
+                        media_url,
+                        data=multipart_data,
+                        headers={"Content-Type": multipart_data.content_type},
+                        auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
+                    ).json()
+                    services_table.update(
+                        service["id"],
+                        {
+                            "Wordpress featured image ID": str(response["id"]),
+                            "Last uploaded image name": fileName,
+                        },
+                    )
+                    resource_body["featured_media"] = response["id"]
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping upload", fg="yellow")
+                    )
+
+            if service["fields"].get("Order of Service ID"):
+
+                click.echo("Order of Service ID found, updating!")
+
+                if update:
+                    response = requests.post(
+                        url + "/{}".format(service["fields"]["Order of Service ID"]),
+                        headers=header,
+                        json=resource_body,
+                    ).json()
+                    services_table.update(
+                        service["id"],
+                        {"Order of Service ID": str(response["id"])},
+                    )
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping creation", fg="yellow")
+                    )
+
+            else:
+
+                click.echo(
+                    click.style("No Order of Service ID found, creating!", fg="green")
+                )
+
+                resource_body["status"] = "draft"
+
+                if update:
+                    response = requests.post(
+                        url, headers=header, json=resource_body
+                    ).json()
+                    print("New OOS created with ID {id}!".format(id=response["id"]))
+                    services_table.update(
+                        service["id"], {"Order of Service ID": str(response["id"])}
+                    )
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping creation", fg="yellow")
+                    )
+
+            podcast_resource_body = {
+                "title": service_object.title_string,
+                "slug": service_object.slug,
+                "date": service_object.datetime.isoformat(),
+                "content": "<p>{}</p>".format(service_object.description),
+            }
+
+            if service["fields"].get("Podcast ID"):
+
+                click.echo("Podcast ID found, updating!")
+
+                if update:
+                    response = requests.post(
+                        podcast_url + "/{}".format(service["fields"]["Podcast ID"]),
+                        headers=header,
+                        json=podcast_resource_body,
+                    ).json()
+                    services_table.update(
+                        service["id"],
+                        {"Podcast ID": str(response["id"])},
+                    )
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping creation", fg="yellow")
+                    )
+
+            else:
+
+                click.echo(click.style("No Podcast ID found, creating!", fg="green"))
+
+                podcast_resource_body["status"] = "draft"
+
+                if update:
+                    response = requests.post(
+                        podcast_url, headers=header, json=podcast_resource_body
+                    ).json()
+                    print("New Podcast created with ID {id}!".format(id=response["id"]))
+                    services_table.update(
+                        service["id"], {"Podcast ID": str(response["id"])}
+                    )
+                else:
+                    click.echo(
+                        click.style("In preview mode, skipping creation", fg="yellow")
+                    )
+
+    click.echo(click.style("Done!", fg="green"))
+
+
+def build_service_data_from_service(service):
+
+    service_datetime = utils.datetime_from_iso_str(service["fields"]["Date & time"])
+
+    if service["fields"].get("Technician"):
+        technician_name = service["fields"]["Technician"]["name"]
+    else:
+        technician_name = None
+
+    if service["fields"].get("Streaming?") and service["fields"]["Streaming?"] == "Yes":
+        streaming = True
+    else:
+        streaming = False
+
+    if service["fields"].get("Fee payable?"):
+        fee_payable = True
+    else:
+        fee_payable = False
+
+    return {
+        "url": "https://airtable.com/{base_id}/{table_id}/{item_id}".format(
+            base_id=AIRTABLE_BASE_ID,
+            table_id=AIRTABLE_SERVICES_TABLE_ID,
+            item_id=service["id"],
+        ),
+        "title": service["fields"]["Name"],
+        "type": service["fields"]["Type"],
+        "datetime": service_datetime.strftime("%A %-d %B %Y at %-I.%M %p"),
+        "technician": technician_name,
+        "streaming": streaming,
+        "fee_payable": fee_payable,
+    }
+
+
+def get_upcoming_streaming_services(services_table):
+
+    click.echo(
+        click.style("Getting upcoming streaming services from Airtable…", fg="blue")
+    )
+
+    return services_table.all(
+        formula="AND({Date & time} >= TODAY(),{Streaming?} = 'Yes')",
+        sort=["Date & time"],
+    )
+
+
+if __name__ == "__main__":
+    utilities()

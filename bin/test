@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+import unittest
+
+from service import AIRTABLE_MAP, Service
+
+
+class testService(unittest.TestCase):
+    def test_service_name_field(self):
+
+        service = Service({"fields": {AIRTABLE_MAP["name"]: "Test Service"}})
+        self.assertEqual(service.name_field, "Test Service")
+
+    def test_liturgical_name_field_returns_if_present(self):
+
+        service = Service(
+            {"fields": {AIRTABLE_MAP["liturgical_name"]: "Test Liturgical Name"}}
+        )
+        self.assertEqual(service.liturgical_name_field, "Test Liturgical Name")
+
+    def test_liturgical_name_field_returns_none_if_missing(self):
+
+        service = Service({"fields": {}})
+        self.assertIsNone(service.liturgical_name_field)
+
+    def test_title_string(self):
+
+        service_with_no_liturgical_name = Service(
+            {"fields": {AIRTABLE_MAP["name"]: "Test Service"}}
+        )
+
+        service_with_liturgical_name = Service(
+            {
+                "fields": {
+                    AIRTABLE_MAP["name"]: "Test Service",
+                    AIRTABLE_MAP["liturgical_name"]: "Test Liturgical Name",
+                }
+            }
+        )
+
+        self.assertEqual(service_with_no_liturgical_name.title_string, "Test Service")
+
+        self.assertEqual(
+            service_with_liturgical_name.title_string, "Test Liturgical Name"
+        )
+
+    def test_described_as(self):
+
+        standard_service = Service({"fields": {AIRTABLE_MAP["name"]: "Test Service"}})
+
+        said_eucharist_service = Service(
+            {
+                "fields": {
+                    AIRTABLE_MAP["name"]: "Test Said Eucharist Service",
+                }
+            }
+        )
+
+        sung_eucharist_service = Service(
+            {
+                "fields": {
+                    AIRTABLE_MAP["name"]: "Test Sung Eucharist Service",
+                }
+            }
+        )
+
+        self.assertEqual(standard_service.described_as, "service")
+
+        self.assertEqual(said_eucharist_service.described_as, "service")
+        self.assertEqual(sung_eucharist_service.described_as, "sung Eucharist")
+
+
+if __name__ == "__main__":
+    unittest.main()

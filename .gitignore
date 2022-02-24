@@ -1,0 +1,11 @@
+__pycache__
+
+.vscode
+
+.env
+email.html
+client_secret.json
+token.json
+
+images/service_specific/*
+!images/service_specific/.gitkeep

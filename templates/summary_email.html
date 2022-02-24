@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>St Mary's Church, Whitkirk: Streaming services summary</title>
+
+  <style type="text/css">
+    
+    /* Outlines the grids, remove when sending */
+    /* table td { border: 1px solid cyan; } */
+
+    /* CLIENT-SPECIFIC STYLES */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
+
+    /* STYLES */
+    img { border: 0; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; font-family: arial; }
+    hr { border: 2px solid #D2D2D2; }
+    hr.itembreak { border: 1px dashed #D2D2D2; }
+    .subtitle { font-size: 1.6em; font-weight: bold; }
+
+    /* iOS BLUE LINKS */
+    a[x-apple-data-detectors] {
+      color: inherit !important;
+      text-decoration: none !important;
+      font-size: inherit !important;
+      font-family: inherit !important;
+      font-weight: inherit !important;
+      line-height: inherit !important;
+    }
+
+    /* ANDROID CENTER FIX */
+    div[style*="margin: 16px 0;"] { margin: 0 !important; }
+
+    /* MEDIA QUERIES */
+    @media all and (max-width:639px){ 
+      .wrapper{ width:320px!important; padding: 0 !important; }
+      .container{ width:300px!important;  padding: 0 !important; }
+      .mobile{ width:300px!important; display:block!important; padding: 0 !important; }
+      .img{ width:100% !important; height:auto !important; }
+      *[class="mobileOff"] { width: 0px !important; display: none !important; }
+      *[class*="mobileOn"] { display: block !important; max-height:none !important; }
+    }
+
+  </style>    
+</head>
+<body style="margin:0; padding:0; background-color:#F2F2F2;">
+  
+  <span style="display: block; width: 640px !important; max-width: 640px; height: 1px" class="mobileOff"></span>
+  
+  <center>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#F2F2F2">
+      <tr>
+        <td align="center" valign="top">
+
+          <!-- BEGIN HEADER -->
+            
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td align="center" valign="top">
+                        <h1><img src="https://whitkirkchurch.org.uk/wp-content/themes/whitkirk/img/logo.png" width="110" height="110" style="margin:0; padding:0; border:none; display:block;" border="0" alt="St Mary's Church, Whitkirk" /></h1>
+                      <p class="subtitle">Streaming services summary</p>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          <!-- END HEADER -->
+
+          <!-- BEGIN SERVICES THIS WEEK -->
+          
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <h2>Services this week</h2>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+
+            {% if services_this_week|length %}
+              {% for service in services_this_week %}
+                
+                {% with full_details = true %}
+                  {% include 'parts/service.html' %}
+                {% endwith %}
+
+              {% endfor %}
+            {% else %}
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <p>There are no streaming services this week.</p>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            {% endif %}
+
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          <!-- END SERVICES THIS WEEK -->
+
+          <!-- BEGIN UNDECIDED SERVICES -->
+
+          {% if services_undecided|length %}
+          
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <h2>Services without decision on streaming</h2>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+              <tr>
+                <td align="center" valign="top">
+
+                  <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                    <tr>
+                      <td>
+                          <p>These are services which are in ChurchSuite, but where we haven't yet recorded if the service should be streamed or not.</p>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+              </tr>
+
+              {% for service in services_undecided %}
+                
+                  {% include 'parts/service.html' %}
+
+              {% endfor %}
+
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          {% endif %}
+
+          <!-- END SERVICES UNDECIDED -->
+
+          <!-- BEGIN SERVICES LATER -->
+
+          {% set services_to_show = 4 %}
+          
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <h2>Services after this week</h2>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+
+            {% if services_later|length %}
+
+              {% if services_later|length > services_to_show %}
+                <tr>
+                  <td align="center" valign="top">
+
+                    <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                      <tr>
+                        <td>
+                            <p><small>Only the first {{ services_to_show }} services after this week are shown here. <a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwC7LfYZ9nf255UW">See all upcoming services</a>.</small></p>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              {% endif %}
+
+              {% for service in services_later[:services_to_show] %}
+                
+                  {% include 'parts/service.html' %}
+
+              {% endfor %}
+
+            {% else %}
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <p>There are no streaming services after this week.</p>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            {% endif %}
+
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          <!-- END SERVICES LATER -->
+
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <h2>Useful links</h2>
+
+                        <ul>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwC7LfYZ9nf255UW">All upcoming services</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwXUX7nB2gUqmq9e">All upcoming streaming services</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwYlVpw2QN6E3au4">All services without a stream decision</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwJwEvfIVOxQWD1H">All streaming services yet to be assigned a technician</a></li>
+                          <li><a href="https://airtable.com/appGLUWQZXnTB6TVI/tbl9ETAuDqogyLcMn/viwSdusaAXXTiXBLM">Calendar view of streaming services</a></li>
+                        </ul>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;"><hr></td>
+            </tr>
+          </table>
+
+          <table width="640" cellpadding="0" cellspacing="0" border="0" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td align="center" valign="top">
+
+                <table width="600" cellpadding="0" cellspacing="0" border="0" class="container">
+                  <tr>
+                    <td>
+                        <p><small>You're receiving this email because you're part of the St Mary's Church, Whitkirk service streaming team.</small></p>
+
+                        <p><small>Generated {{ send_time_string }}.</small></p>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            <tr>
+              <td height="10" style="font-size:10px; line-height:10px;">&nbsp;</td>
+            </tr>
+          </table>
+            
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>
