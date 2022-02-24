@@ -210,17 +210,14 @@ def send_report(send_email):
 
         service_object = Service(service)
 
-        service_data = build_service_data_from_service(service)
-
         if service_object.datetime >= next_week:
-            email_variables["services_later"].append(service_data)
+            email_variables["services_later"].append(service_object.service_data)
         else:
-            email_variables["services_this_week"].append(service_data)
+            email_variables["services_this_week"].append(service_object.service_data)
 
     for service in services_undecided:
-        email_variables["services_undecided"].append(
-            build_service_data_from_service(service)
-        )
+        service_object = Service(service)
+        email_variables["services_undecided"].append(service_object.service_data)
 
     click.echo(click.style("Building template…", fg="blue"))
 
@@ -740,40 +737,6 @@ def sync_with_wordpress(update):
                     )
 
     click.echo(click.style("Done!", fg="green"))
-
-
-def build_service_data_from_service(service):
-
-    service_object = Service(service)
-
-    if service["fields"].get("Technician"):
-        technician_name = service["fields"]["Technician"]["name"]
-    else:
-        technician_name = None
-
-    if service["fields"].get("Streaming?") and service["fields"]["Streaming?"] == "Yes":
-        streaming = True
-    else:
-        streaming = False
-
-    if service["fields"].get("Fee payable?"):
-        fee_payable = True
-    else:
-        fee_payable = False
-
-    return {
-        "url": "https://airtable.com/{base_id}/{table_id}/{item_id}".format(
-            base_id=AIRTABLE_BASE_ID,
-            table_id=AIRTABLE_SERVICES_TABLE_ID,
-            item_id=service["id"],
-        ),
-        "title": service["fields"]["Name"],
-        "type": service["fields"]["Type"],
-        "datetime": service_object.datetime.strftime("%A %-d %B %Y at %-I.%M %p"),
-        "technician": technician_name,
-        "streaming": streaming,
-        "fee_payable": fee_payable,
-    }
 
 
 def get_upcoming_streaming_services(services_table):
