@@ -2,6 +2,10 @@ __pycache__
 
 .vscode
 
+.coverage
+coverage.xml
+htmlcov
+
 .env
 email.html
 client_secret.json
