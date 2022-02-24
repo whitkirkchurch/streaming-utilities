@@ -9,6 +9,7 @@ AIRTABLE_MAP = {
     "liturgical_name": "Liturgical name",
     "name": "Name",
     "slug": "Slug",
+    "stream_public": "Stream public?",
     "streaming": "Streaming?",
     "technician": "Technician",
     "type": "Type",
@@ -62,6 +63,13 @@ class Service:
     @property
     def is_streaming(self):
         if self.streaming_field and self.streaming_field == "Yes":
+            return True
+
+        return False
+
+    @property
+    def is_stream_public(self):
+        if self.airtable_fields.get(AIRTABLE_MAP["stream_public"]):
             return True
 
         return False

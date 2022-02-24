@@ -463,7 +463,7 @@ def sync_with_wordpress(update):
         service_object = Service(service)
 
         # We only generate OOS for public streams
-        if "Stream public?" in service["fields"]:
+        if service_object.is_stream_public:
 
             click.echo(service_object.title_string)
 
