@@ -354,7 +354,7 @@ def sync_with_youtube(update):
         # Build up the description
 
         order_of_service_url = "https://whitkirkchurch.org.uk/oos/{slug}".format(
-            slug=service["fields"]["Slug"]
+            slug=service_object.slug
         )
 
         youtube_description = (
