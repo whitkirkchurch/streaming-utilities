@@ -537,8 +537,8 @@ def sync_with_wordpress(update):
                 ),
             }
 
-            if "Order of Service ID" in service["fields"]:
-                media_resource_body["post"] = service["fields"]["Order of Service ID"]
+            if service_object.order_of_service_id:
+                media_resource_body["post"] = service_object.order_of_service_id
 
             if featured_image_id:
 
@@ -653,19 +653,19 @@ def sync_with_wordpress(update):
                         click.style("In preview mode, skipping upload", fg="yellow")
                     )
 
-            if service["fields"].get("Order of Service ID"):
+            if service_object.order_of_service_id:
 
                 click.echo("Order of Service ID found, updating!")
 
                 if update:
                     response = requests.post(
-                        url + "/{}".format(service["fields"]["Order of Service ID"]),
+                        url + "/{}".format(service_object.order_of_service_id),
                         headers=header,
                         json=resource_body,
                     ).json()
                     services_table.update(
                         service["id"],
-                        {"Order of Service ID": str(response["id"])},
+                        {AIRTABLE_MAP["oos_id"]: str(response["id"])},
                     )
                 else:
                     click.echo(
@@ -686,7 +686,7 @@ def sync_with_wordpress(update):
                     ).json()
                     print("New OOS created with ID {id}!".format(id=response["id"]))
                     services_table.update(
-                        service["id"], {"Order of Service ID": str(response["id"])}
+                        service["id"], {AIRTABLE_MAP["oos_id"]: str(response["id"])}
                     )
                 else:
                     click.echo(

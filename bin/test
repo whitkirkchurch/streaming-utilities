@@ -64,6 +64,11 @@ class testService(unittest.TestCase):
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
         self.assertEqual(service.churchsuite_category_id, "123")
 
+    def test_order_of_service_id(self):
+
+        service = serviceFactory({AIRTABLE_MAP["oos_id"]: "1234"})
+        self.assertEqual(service.order_of_service_id, "1234")
+
     def test_youtube_id(self):
 
         service = serviceFactory({AIRTABLE_MAP["youtube_id"]: "a1-b2_c3"})

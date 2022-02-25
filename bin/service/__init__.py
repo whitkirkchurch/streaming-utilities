@@ -9,6 +9,7 @@ AIRTABLE_MAP = {
     "fee_payable": "Fee payable?",
     "liturgical_name": "Liturgical name",
     "name": "Name",
+    "oos_id": "Order of Service ID",
     "slug": "Slug",
     "stream_public": "Stream public?",
     "streaming": "Streaming?",
@@ -50,6 +51,10 @@ class Service:
     @property
     def churchsuite_category_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_category_id"])
+
+    @property
+    def order_of_service_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["oos_id"])
 
     @property
     def youtube_id(self):
