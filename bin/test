@@ -64,6 +64,11 @@ class testService(unittest.TestCase):
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
         self.assertEqual(service.churchsuite_category_id, "123")
 
+    def test_youtube_id(self):
+
+        service = serviceFactory({AIRTABLE_MAP["youtube_id"]: "a1-b2_c3"})
+        self.assertEqual(service.youtube_id, "a1-b2_c3")
+
     def test_datetime_field(self):
 
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})

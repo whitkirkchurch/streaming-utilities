@@ -36,7 +36,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from service import Service
+from service import Service, AIRTABLE_MAP
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -376,11 +376,11 @@ def sync_with_youtube(update):
                 "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
             }
 
-            if service["fields"].get("YouTube ID"):
+            if service_object.youtube_id:
 
                 click.echo("YouTube ID found, updating!")
 
-                resource_body["id"] = service["fields"]["YouTube ID"]
+                resource_body["id"] = service_object.youtube_id
 
                 request = youtube.liveBroadcasts().update(
                     part="snippet,status",
@@ -398,7 +398,9 @@ def sync_with_youtube(update):
 
             if update:
                 response = request.execute()
-                services_table.update(service["id"], {"YouTube ID": response["id"]})
+                services_table.update(
+                    service["id"], {AIRTABLE_MAP["youtube_id"]: response["id"]}
+                )
 
                 request = youtube.liveBroadcasts().bind(
                     part="id",
@@ -511,8 +513,8 @@ def sync_with_wordpress(update):
                 },
             }
 
-            if "YouTube ID" in service["fields"]:
-                resource_body["acf"]["youtube"] = service["fields"]["YouTube ID"]
+            if service_object.youtube_id:
+                resource_body["acf"]["youtube"] = service_object.youtube_id
                 resource_body["acf"]["streamed"] = True
 
             if "Wordpress featured image ID" in service["fields"]:

@@ -14,6 +14,7 @@ AIRTABLE_MAP = {
     "streaming": "Streaming?",
     "technician": "Technician",
     "type": "Type",
+    "youtube_id": "YouTube ID",
 }
 
 
@@ -49,6 +50,10 @@ class Service:
     @property
     def churchsuite_category_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_category_id"])
+
+    @property
+    def youtube_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["youtube_id"])
 
     @property
     def datetime(self):
