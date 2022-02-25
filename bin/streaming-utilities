@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
 
+import sys
 import os
+import rollbar
+
+ROLLBAR_ACCESS_TOKEN = os.environ["ROLLBAR_ACCESS_TOKEN"]
+
+rollbar.init(ROLLBAR_ACCESS_TOKEN)
+
+
+def rollbar_except_hook(exc_type, exc_value, traceback):
+    rollbar.report_exc_info((exc_type, exc_value, traceback))
+    sys.__excepthook__(exc_type, exc_value, traceback)
+
+
+sys.excepthook = rollbar_except_hook
+
 import requests
 import base64
 import urllib.request
