@@ -180,6 +180,38 @@ class testService(unittest.TestCase):
         self.assertEqual(said_eucharist_service.described_as, "service")
         self.assertEqual(sung_eucharist_service.described_as, "sung Eucharist")
 
+    def test_service_description(self):
+
+        standard_service = serviceFactory({AIRTABLE_MAP["name"]: "Test Service"})
+
+        sung_eucharist_service = serviceFactory(
+            {
+                AIRTABLE_MAP["name"]: "Test Sung Eucharist Service",
+            }
+        )
+
+        sung_eucharist_with_liturgical_name_service = serviceFactory(
+            {
+                AIRTABLE_MAP["name"]: "Test Sung Eucharist Service",
+                AIRTABLE_MAP[
+                    "liturgical_name"
+                ]: "the eleventy-first Sunday after Trinity",
+            }
+        )
+
+        self.assertEqual(
+            standard_service.description,
+            "A service streamed live from St Mary's Church, Whitkirk.",
+        )
+        self.assertEqual(
+            sung_eucharist_service.description,
+            "A sung Eucharist streamed live from St Mary's Church, Whitkirk.",
+        )
+        self.assertEqual(
+            sung_eucharist_with_liturgical_name_service.description,
+            "A sung Eucharist streamed live from St Mary's Church, Whitkirk for the eleventy-first Sunday after Trinity.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
