@@ -1,5 +1,7 @@
 # St Mary's Church Whitkirk Streaming Utilities
 
+[![Tests](https://github.com/whitkirkchurch/streaming-utilities/actions/workflows/test.yml/badge.svg)](https://github.com/whitkirkchurch/streaming-utilities/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/whitkirkchurch/streaming-utilities/branch/main/graph/badge.svg?token=W63QDRRZCQ)](https://codecov.io/gh/whitkirkchurch/streaming-utilities) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/whitkirkchurch/streaming-utilities.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/whitkirkchurch/streaming-utilities/context:python)
+
 A collection of useful utilities which make the lives of our streaming team easier, by automating a bunch of stuff we used to do manually.
 
 ## Import from ChurchSuite
