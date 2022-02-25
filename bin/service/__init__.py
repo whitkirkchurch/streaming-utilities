@@ -1,6 +1,11 @@
+import os
+
 import re
 
 from pyairtable import utils
+
+AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
+AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
 
 
 AIRTABLE_MAP = {

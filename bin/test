@@ -43,14 +43,14 @@ class testService(unittest.TestCase):
     def test_technician_field(self):
 
         service = serviceFactory(
-            {AIRTABLE_MAP["technician"]: {"Name": "Test Technician"}}
+            {AIRTABLE_MAP["technician"]: {"name": "Test Technician"}}
         )
-        self.assertEqual(service.technician_field, {"Name": "Test Technician"})
+        self.assertEqual(service.technician_field, {"name": "Test Technician"})
 
     def test_technician_name_field(self):
 
         service_with_technician = serviceFactory(
-            {AIRTABLE_MAP["technician"]: {"Name": "Test Technician"}}
+            {AIRTABLE_MAP["technician"]: {"name": "Test Technician"}}
         )
 
         service_without_technician = serviceFactory({})
