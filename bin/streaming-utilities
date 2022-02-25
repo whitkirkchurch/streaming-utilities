@@ -700,19 +700,19 @@ def sync_with_wordpress(update):
                 "content": "<p>{}</p>".format(service_object.description),
             }
 
-            if service["fields"].get("Podcast ID"):
+            if service_object.podcast_id:
 
                 click.echo("Podcast ID found, updating!")
 
                 if update:
                     response = requests.post(
-                        podcast_url + "/{}".format(service["fields"]["Podcast ID"]),
+                        podcast_url + "/{}".format(service_object.podcast_id),
                         headers=header,
                         json=podcast_resource_body,
                     ).json()
                     services_table.update(
                         service["id"],
-                        {"Podcast ID": str(response["id"])},
+                        {AIRTABLE_MAP["podcast_id"]: str(response["id"])},
                     )
                 else:
                     click.echo(

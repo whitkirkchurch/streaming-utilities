@@ -15,6 +15,7 @@ AIRTABLE_MAP = {
     "liturgical_name": "Liturgical name",
     "name": "Name",
     "oos_id": "Order of Service ID",
+    "podcast_id": "Podcast ID",
     "slug": "Slug",
     "stream_public": "Stream public?",
     "streaming": "Streaming?",
@@ -62,6 +63,10 @@ class Service:
         return self.airtable_fields.get(AIRTABLE_MAP["oos_id"])
 
     @property
+    def podcast_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["podcast_id"])
+
+    @property
     def youtube_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["youtube_id"])
 
@@ -72,7 +77,7 @@ class Service:
     @property
     def technician_name(self):
         if self.technician_field:
-            return self.airtable_fields.get(AIRTABLE_MAP["technician"])["Name"]
+            return self.airtable_fields.get(AIRTABLE_MAP["technician"])["name"]
 
         return None
 
