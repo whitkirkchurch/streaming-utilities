@@ -4,6 +4,24 @@
 
 A collection of useful utilities which make the lives of our streaming team easier, by automating a bunch of stuff we used to do manually.
 
+## Data flow
+
+```mermaid
+    graph TD
+        CS[ChurchSuite calendar]
+        AT[Airtable]
+        OOS[Order of service stubs]
+        POD[Podcast stubs]
+        YT[YouTube streams]
+        E[Email reports]
+        
+        CS --> AT
+        AT --> OOS
+        AT --> POD
+        AT --> YT
+        AT --> E
+```
+
 ## Actions
 
 ### Import from ChurchSuite
