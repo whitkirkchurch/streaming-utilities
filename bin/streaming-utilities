@@ -504,6 +504,7 @@ def sync_with_wordpress(update):
                     "physical": True,
                     "show_bcp_reproduction_notice": show_bcp_reproduction_notice,
                 },
+                "excerpt": service_object.description,
             }
 
             if service_object.youtube_id:
