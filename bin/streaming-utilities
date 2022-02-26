@@ -26,6 +26,7 @@ import boto3
 import click
 
 import datetime
+import pytz
 
 from pyairtable import Table, utils
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -83,6 +84,8 @@ AWS_S3_BUCKET_NAME = os.environ["AWS_S3_BUCKET_NAME"]
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET = os.environ["AWS_SECRET"]
 
+TZ_LONDON = pytz.timezone("Europe/London")
+
 s3 = boto3.resource(
     "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET
 )
@@ -122,9 +125,13 @@ def import_from_churchsuite():
             )
         )
 
+        parsed_date = TZ_LONDON.localize(
+            datetime.datetime.strptime(event["datetime_start"], "%Y-%m-%d %H:%M:%S")
+        )
+
         events_to_sync[service_url] = {
             "name": event["name"],
-            "datetime": event["datetime_start"],
+            "datetime": parsed_date,
             "category": event["category"]["name"],
             "category_id": event["category"]["id"],
         }
@@ -151,7 +158,7 @@ def import_from_churchsuite():
         event_data_blob = {
             "ChurchSuite event": event_sync_identifier,
             "Name": event["name"],
-            "Date & time": event["datetime"],
+            "Date & time": event["datetime"].isoformat(),
             "Type": event["category"],
             "ChurchSuite Category ID": str(event["category_id"]),
         }
@@ -507,7 +514,7 @@ def sync_with_wordpress(update):
                     service_object.datetime - datetime.timedelta(days=1)
                 ).isoformat(),
                 "acf": {
-                    "datetime": service_object.datetime.isoformat(),
+                    "datetime": service_object.datetime_as_naive_string,
                     "physical": True,
                     "show_bcp_reproduction_notice": show_bcp_reproduction_notice,
                 },

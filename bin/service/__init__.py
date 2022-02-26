@@ -2,11 +2,11 @@ import os
 
 import re
 
+import pytz
 from pyairtable import utils
 
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
 AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
-
 
 AIRTABLE_MAP = {
     "churchsuite_category_id": "ChurchSuite Category ID",
@@ -23,6 +23,9 @@ AIRTABLE_MAP = {
     "type": "Type",
     "youtube_id": "YouTube ID",
 }
+
+TZ_GMT = pytz.timezone("Etc/GMT")
+TZ_LONDON = pytz.timezone("Europe/London")
 
 
 class Service:
@@ -72,7 +75,13 @@ class Service:
 
     @property
     def datetime(self):
-        return utils.datetime_from_iso_str(self.datetime_field)
+        return TZ_GMT.localize(
+            utils.datetime_from_iso_str(self.datetime_field)
+        ).astimezone(TZ_LONDON)
+
+    @property
+    def datetime_as_naive_string(self):
+        return self.datetime.strftime("%Y-%m-%d %H:%M:%S")
 
     @property
     def technician_name(self):
