@@ -192,10 +192,17 @@ class testService(unittest.TestCase):
             }
         )
 
-        self.assertEqual(standard_service.described_as, "service")
+        evensong_service = serviceFactory(
+            {
+                AIRTABLE_MAP["name"]: "Test Choral Evensong Service",
+                AIRTABLE_MAP["churchsuite_category_id"]: "34",
+            }
+        )
 
+        self.assertEqual(standard_service.described_as, "service")
         self.assertEqual(said_eucharist_service.described_as, "service")
         self.assertEqual(sung_eucharist_service.described_as, "sung Eucharist")
+        self.assertEqual(evensong_service.described_as, "service of Choral Evensong")
 
     def test_service_description(self):
 

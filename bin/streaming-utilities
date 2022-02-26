@@ -37,7 +37,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from service import Service, AIRTABLE_MAP
+from service import Service, AIRTABLE_MAP, CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -54,17 +54,6 @@ CHURCHSUITE_CATEGORIES_TO_SYNC = [
     "25",  # Easter
     "34",  # Choral Evensong
 ]
-
-CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
-    "9": {"default_thumbnail": "wedding.jpg"},
-    "10": {"default_thumbnail": "funeral.jpg"},
-    "34": {
-        "default_thumbnail": "evensong.jpg",
-        "default_featured_image_id": "6899",
-        "describe_service_as": "service of Choral Evensong",
-        "show_bcp_reproduction_notice": True,
-    },
-}
 
 MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
 MAILGUN_API_KEY = os.environ["MAILGUN_API_KEY"]
@@ -341,9 +330,6 @@ def sync_with_youtube(update):
                 service_image = "images/default_thumbnails/{}".format(
                     category_overrides["default_thumbnail"]
                 )
-
-            if "describe_service_as" in category_overrides:
-                describe_service_as = category_overrides["describe_service_as"]
 
         if "ChurchSuite Image" in service["fields"]:
             click.echo(click.style("Service-specific image found...", fg="blue"))

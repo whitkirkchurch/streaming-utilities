@@ -24,6 +24,17 @@ AIRTABLE_MAP = {
     "youtube_id": "YouTube ID",
 }
 
+CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
+    "9": {"default_thumbnail": "wedding.jpg"},
+    "10": {"default_thumbnail": "funeral.jpg"},
+    "34": {
+        "default_thumbnail": "evensong.jpg",
+        "default_featured_image_id": "6899",
+        "describe_service_as": "service of Choral Evensong",
+        "show_bcp_reproduction_notice": True,
+    },
+}
+
 TZ_GMT = pytz.timezone("Etc/GMT")
 TZ_LONDON = pytz.timezone("Europe/London")
 
@@ -32,6 +43,16 @@ class Service:
     def __init__(self, airtable_object):
         self.id = airtable_object["id"]
         self.airtable_fields = airtable_object["fields"]
+
+        if self.churchsuite_category_id in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES:
+
+            self.category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
+                self.churchsuite_category_id
+            ]
+
+        else:
+
+            self.category_overrides = {}
 
     @property
     def datetime_field(self):
@@ -136,6 +157,9 @@ class Service:
 
     @property
     def described_as(self):
+
+        if "describe_service_as" in self.category_overrides:
+            return self.category_overrides["describe_service_as"]
 
         if re.search("sung eucharist", self.name_field, re.IGNORECASE):
             return "sung Eucharist"
