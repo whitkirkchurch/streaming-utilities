@@ -10,6 +10,9 @@ AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
 
 AIRTABLE_MAP = {
     "churchsuite_category_id": "ChurchSuite Category ID",
+    "churchsuite_id": "ChurchSuite ID",
+    "churchsuite_image": "ChurchSuite Image",
+    "churchsuite_public_identifier": "ChurchSuite public identifier",
     "datetime": "Date & time",
     "fee_payable": "Fee payable?",
     "liturgical_name": "Liturgical name",

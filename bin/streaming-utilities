@@ -143,16 +143,16 @@ def import_from_churchsuite():
         )
 
         event_data_blob = {
-            "Name": event["name"],
-            "Date & time": event["datetime"].isoformat(),
-            "Type": event["category"],
-            "ChurchSuite ID": str(event["id"]),
-            "ChurchSuite public identifier": event["identifier"],
-            "ChurchSuite Category ID": str(event["category_id"]),
+            AIRTABLE_MAP["name"]: event["name"],
+            AIRTABLE_MAP["datetime"]: event["datetime"].isoformat(),
+            AIRTABLE_MAP["type"]: event["category"],
+            AIRTABLE_MAP["churchsuite_id"]: str(event["id"]),
+            AIRTABLE_MAP["churchsuite_public_identifier"]: event["identifier"],
+            AIRTABLE_MAP["churchsuite_category_id"]: str(event["category_id"]),
         }
 
         if "image_url" in event:
-            event_data_blob["ChurchSuite Image"] = [
+            event_data_blob[AIRTABLE_MAP["churchsuite_image"]] = [
                 utils.attachment(event["image_url"])
             ]
 
