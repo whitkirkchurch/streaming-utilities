@@ -199,7 +199,7 @@ def send_report(send_email):
         "send_time_string": now.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
-    next_week = datetime.datetime.today() + datetime.timedelta(weeks=1)
+    next_week = datetime.datetime.today().astimezone() + datetime.timedelta(weeks=1)
 
     for service in services_to_stream:
 
