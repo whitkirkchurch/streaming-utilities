@@ -25,6 +25,7 @@ AIRTABLE_MAP = {
     "technician": "Technician",
     "type": "Type",
     "wp_image_id": "Wordpress featured image ID",
+    "wp_image_last_uploaded_name": "Last uploaded image name",
     "youtube_id": "YouTube ID",
 }
 
@@ -87,6 +88,10 @@ class Service:
         return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_category_id"])
 
     @property
+    def churchsuite_image_field(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_image"])
+
+    @property
     def order_of_service_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["oos_id"])
 
@@ -97,6 +102,10 @@ class Service:
     @property
     def wordpress_image_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["wp_image_id"])
+
+    @property
+    def wordpress_image_last_uploaded_name(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["wp_image_last_uploaded_name"])
 
     @property
     def youtube_id(self):

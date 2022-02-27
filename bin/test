@@ -79,6 +79,12 @@ class testService(unittest.TestCase):
         service = serviceFactory({AIRTABLE_MAP["youtube_id"]: "a1-b2_c3"})
         self.assertEqual(service.youtube_id, "a1-b2_c3")
 
+    def test_churchsuite_image_field(self):
+        service = serviceFactory(
+            {AIRTABLE_MAP["churchsuite_image"]: {"id": "tEsTiMaGeId"}}
+        )
+        self.assertEqual(service.churchsuite_image_field, {"id": "tEsTiMaGeId"})
+
     def test_wordpress_image_id(self):
 
         service = serviceFactory({AIRTABLE_MAP["wp_image_id"]: "3456"})
