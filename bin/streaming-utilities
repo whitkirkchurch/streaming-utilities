@@ -108,17 +108,15 @@ def import_from_churchsuite():
 
     for event in churchsuite_events:
 
-        service_url = (
-            "https://{churchsuite_account_id}.churchsuite.co.uk/event/{id}".format(
-                id=event["identifier"], churchsuite_account_id=CHURCHSUITE_ACCOUNT
-            )
-        )
-
         parsed_date = TZ_LONDON.localize(
             datetime.datetime.strptime(event["datetime_start"], "%Y-%m-%d %H:%M:%S")
         )
 
-        events_to_sync[service_url] = {
+        event_id = str(event["id"])
+
+        events_to_sync[event_id] = {
+            "id": event_id,
+            "identifier": event["identifier"],
             "name": event["name"],
             "datetime": parsed_date,
             "category": event["category"]["name"],
@@ -126,7 +124,7 @@ def import_from_churchsuite():
         }
 
         if event["images"]:
-            events_to_sync[service_url]["image_url"] = event["images"]["lg"]["url"]
+            events_to_sync[event_id]["image_url"] = event["images"]["lg"]["url"]
 
     table = Table(AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID)
 
@@ -141,14 +139,15 @@ def import_from_churchsuite():
         )
 
         existing_event = table.first(
-            formula="{ChurchSuite event} = '" + event_sync_identifier + "'"
+            formula="{ChurchSuite ID} = '" + event_sync_identifier + "'"
         )
 
         event_data_blob = {
-            "ChurchSuite event": event_sync_identifier,
             "Name": event["name"],
             "Date & time": event["datetime"].isoformat(),
             "Type": event["category"],
+            "ChurchSuite ID": str(event["id"]),
+            "ChurchSuite public identifier": event["identifier"],
             "ChurchSuite Category ID": str(event["category_id"]),
         }
 
@@ -392,7 +391,7 @@ def sync_with_youtube(update):
             if update:
                 response = request.execute()
                 services_table.update(
-                    service["id"], {AIRTABLE_MAP["youtube_id"]: response["id"]}
+                    service_object.id, {AIRTABLE_MAP["youtube_id"]: response["id"]}
                 )
 
                 request = youtube.liveBroadcasts().bind(
@@ -594,7 +593,7 @@ def sync_with_wordpress(update):
                                 auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
                             ).json()
                             services_table.update(
-                                service["id"],
+                                service_object.id,
                                 {
                                     "Wordpress featured image ID": str(response["id"]),
                                     "Last uploaded image name": last_uploaded_file,
@@ -635,7 +634,7 @@ def sync_with_wordpress(update):
                         auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
                     ).json()
                     services_table.update(
-                        service["id"],
+                        service_object.id,
                         {
                             "Wordpress featured image ID": str(response["id"]),
                             "Last uploaded image name": fileName,
@@ -658,7 +657,7 @@ def sync_with_wordpress(update):
                         json=resource_body,
                     ).json()
                     services_table.update(
-                        service["id"],
+                        service_object.id,
                         {AIRTABLE_MAP["oos_id"]: str(response["id"])},
                     )
                 else:
@@ -680,7 +679,7 @@ def sync_with_wordpress(update):
                     ).json()
                     print("New OOS created with ID {id}!".format(id=response["id"]))
                     services_table.update(
-                        service["id"], {AIRTABLE_MAP["oos_id"]: str(response["id"])}
+                        service_object.id, {AIRTABLE_MAP["oos_id"]: str(response["id"])}
                     )
                 else:
                     click.echo(
@@ -705,7 +704,7 @@ def sync_with_wordpress(update):
                         json=podcast_resource_body,
                     ).json()
                     services_table.update(
-                        service["id"],
+                        service_object.id,
                         {AIRTABLE_MAP["podcast_id"]: str(response["id"])},
                     )
                 else:
@@ -725,7 +724,7 @@ def sync_with_wordpress(update):
                     ).json()
                     print("New Podcast created with ID {id}!".format(id=response["id"]))
                     services_table.update(
-                        service["id"], {"Podcast ID": str(response["id"])}
+                        service_object.id, {"Podcast ID": str(response["id"])}
                     )
                 else:
                     click.echo(
