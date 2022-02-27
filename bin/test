@@ -79,6 +79,16 @@ class testService(unittest.TestCase):
         service = serviceFactory({AIRTABLE_MAP["youtube_id"]: "a1-b2_c3"})
         self.assertEqual(service.youtube_id, "a1-b2_c3")
 
+    def test_wordpress_image_id(self):
+
+        service = serviceFactory({AIRTABLE_MAP["wp_image_id"]: "3456"})
+        self.assertEqual(service.wordpress_image_id, "3456")
+
+    def test_wordpress_image_last_uploaded_name(self):
+
+        service = serviceFactory({AIRTABLE_MAP["wp_image_last_uploaded_name"]: "3456"})
+        self.assertEqual(service.wordpress_image_last_uploaded_name, "3456")
+
     def test_datetime_field(self):
 
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})

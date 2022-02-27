@@ -24,6 +24,7 @@ AIRTABLE_MAP = {
     "streaming": "Streaming?",
     "technician": "Technician",
     "type": "Type",
+    "wp_image_id": "Wordpress featured image ID",
     "youtube_id": "YouTube ID",
 }
 
@@ -92,6 +93,10 @@ class Service:
     @property
     def podcast_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["podcast_id"])
+
+    @property
+    def wordpress_image_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["wp_image_id"])
 
     @property
     def youtube_id(self):

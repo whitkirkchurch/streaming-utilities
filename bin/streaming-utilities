@@ -514,8 +514,8 @@ def sync_with_wordpress(update):
                 resource_body["acf"]["youtube"] = service_object.youtube_id
                 resource_body["acf"]["streamed"] = True
 
-            if "Wordpress featured image ID" in service["fields"]:
-                featured_image_id = service["fields"]["Wordpress featured image ID"]
+            if service_object.wordpress_image_id:
+                featured_image_id = service_object.wordpress_image_id
 
             if "ChurchSuite Image" in service["fields"]:
                 click.echo(click.style("Service-specific image found...", fg="blue"))
@@ -640,7 +640,7 @@ def sync_with_wordpress(update):
                     services_table.update(
                         service_object.id,
                         {
-                            "Wordpress featured image ID": str(response["id"]),
+                            AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
                             "Last uploaded image name": fileName,
                         },
                     )
