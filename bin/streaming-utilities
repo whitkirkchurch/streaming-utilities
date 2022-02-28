@@ -357,6 +357,19 @@ def sync_with_youtube(update):
             )
         )
 
+        if service_object.is_stream_public:
+            youtube_privacy = "public"
+            youtube_description = (
+                service_object.description
+                + "\r\n\r\n"
+                + "View the order of service online at {oos_url}".format(
+                    oos_url=order_of_service_url
+                )
+            )
+        else:
+            youtube_privacy = "unlisted"
+            youtube_description = service_object.description
+
         try:
 
             resource_body = {
@@ -365,7 +378,10 @@ def sync_with_youtube(update):
                     "title": service_object.title_string_with_date,
                     "description": youtube_description,
                 },
-                "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+                "status": {
+                    "privacyStatus": youtube_privacy,
+                    "selfDeclaredMadeForKids": False,
+                },
             }
 
             if service_object.youtube_id:
