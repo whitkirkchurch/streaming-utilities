@@ -345,25 +345,13 @@ def sync_with_youtube(update):
 
         # Build up the description
 
-        order_of_service_url = "https://whitkirkchurch.org.uk/oos/{slug}".format(
-            slug=service_object.slug
-        )
-
-        youtube_description = (
-            service_object.description
-            + "\r\n\r\n"
-            + "View the order of service online at {oos_url}".format(
-                oos_url=order_of_service_url
-            )
-        )
-
         if service_object.is_stream_public:
             youtube_privacy = "public"
             youtube_description = (
                 service_object.description
                 + "\r\n\r\n"
-                + "View the order of service online at {oos_url}".format(
-                    oos_url=order_of_service_url
+                + "View the order of service online at https://whitkirkchurch.org.uk/oos/{slug}".format(
+                    slug=service_object.slug
                 )
             )
         else:
