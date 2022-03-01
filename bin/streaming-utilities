@@ -600,7 +600,7 @@ def sync_with_wordpress(update):
                                 service_object.id,
                                 {
                                     "Wordpress featured image ID": str(response["id"]),
-                                    "Last uploaded image name": last_uploaded_file,
+                                    "Last uploaded image name": image_filename_from_airtable,
                                 },
                             )
                             resource_body["featured_media"] = response["id"]
