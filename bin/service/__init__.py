@@ -1,8 +1,8 @@
 import os
-
 import re
-
+import datetime
 import pytz
+
 from pyairtable import utils
 
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -120,6 +120,10 @@ class Service:
     @property
     def datetime_as_naive_string(self):
         return self.datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+    @property
+    def datetime_to_publish_order_of_service(self):
+        return self.datetime - datetime.timedelta(days=1)
 
     @property
     def technician_name(self):
