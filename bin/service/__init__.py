@@ -218,6 +218,13 @@ class Service:
             "fee_payable": self.is_fee_payable,
         }
 
+    @property
+    def youtube_privacy(self):
+        if self.is_stream_public:
+            return "public"
+
+        return "unlisted"
+
     def datetime_to_publish_order_of_service_given_previous_service(
         self, previous_service=None
     ):

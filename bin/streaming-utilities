@@ -346,7 +346,6 @@ def sync_with_youtube(update):
         # Build up the description
 
         if service_object.is_stream_public:
-            youtube_privacy = "public"
             youtube_description = (
                 service_object.description
                 + "\r\n\r\n"
@@ -355,7 +354,6 @@ def sync_with_youtube(update):
                 )
             )
         else:
-            youtube_privacy = "unlisted"
             youtube_description = service_object.description
 
         try:
@@ -367,7 +365,7 @@ def sync_with_youtube(update):
                     "description": youtube_description,
                 },
                 "status": {
-                    "privacyStatus": youtube_privacy,
+                    "privacyStatus": service_object.youtube_privacy,
                     "selfDeclaredMadeForKids": False,
                 },
             }

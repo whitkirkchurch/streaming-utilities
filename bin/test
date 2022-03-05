@@ -300,6 +300,24 @@ class testService(unittest.TestCase):
             "A sung Eucharist streamed live from St Mary's Church, Whitkirk for the eleventy-first Sunday after Trinity.",
         )
 
+    def test_youtube_privacy_for_public_stream(self):
+
+        service = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
+
+        self.assertEqual(
+            service.youtube_privacy,
+            "public",
+        )
+
+    def test_youtube_privacy_for_non_public_stream(self):
+
+        service = serviceFactory({})
+
+        self.assertEqual(
+            service.youtube_privacy,
+            "unlisted",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
