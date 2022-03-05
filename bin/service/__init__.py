@@ -1,8 +1,8 @@
 import os
-
 import re
-
+import datetime
 import pytz
+
 from pyairtable import utils
 
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -10,6 +10,9 @@ AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
 
 AIRTABLE_MAP = {
     "churchsuite_category_id": "ChurchSuite Category ID",
+    "churchsuite_id": "ChurchSuite ID",
+    "churchsuite_image": "ChurchSuite Image",
+    "churchsuite_public_identifier": "ChurchSuite public identifier",
     "datetime": "Date & time",
     "fee_payable": "Fee payable?",
     "liturgical_name": "Liturgical name",
@@ -21,6 +24,8 @@ AIRTABLE_MAP = {
     "streaming": "Streaming?",
     "technician": "Technician",
     "type": "Type",
+    "wp_image_id": "Wordpress featured image ID",
+    "wp_image_last_uploaded_name": "Last uploaded image name",
     "youtube_id": "YouTube ID",
 }
 
@@ -83,12 +88,24 @@ class Service:
         return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_category_id"])
 
     @property
+    def churchsuite_image_field(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["churchsuite_image"])
+
+    @property
     def order_of_service_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["oos_id"])
 
     @property
     def podcast_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["podcast_id"])
+
+    @property
+    def wordpress_image_id(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["wp_image_id"])
+
+    @property
+    def wordpress_image_last_uploaded_name(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["wp_image_last_uploaded_name"])
 
     @property
     def youtube_id(self):
@@ -103,6 +120,10 @@ class Service:
     @property
     def datetime_as_naive_string(self):
         return self.datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+    @property
+    def datetime_to_publish_order_of_service(self):
+        return self.datetime - datetime.timedelta(days=1)
 
     @property
     def technician_name(self):
@@ -196,3 +217,15 @@ class Service:
             "streaming": self.is_streaming,
             "fee_payable": self.is_fee_payable,
         }
+
+    def datetime_to_publish_order_of_service_given_previous_service(
+        self, previous_service=None
+    ):
+
+        if previous_service:
+            return max(
+                self.datetime_to_publish_order_of_service,
+                previous_service.datetime + datetime.timedelta(hours=1),
+            )
+
+        return self.datetime_to_publish_order_of_service

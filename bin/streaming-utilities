@@ -4,17 +4,17 @@ import sys
 import os
 import rollbar
 
-if os.environ["ENVIRONMENT"] == "production":
+ROLLBAR_ACCESS_TOKEN = os.environ["ROLLBAR_ACCESS_TOKEN"]
 
-    ROLLBAR_ACCESS_TOKEN = os.environ["ROLLBAR_ACCESS_TOKEN"]
+rollbar.init(ROLLBAR_ACCESS_TOKEN)
 
-    rollbar.init(ROLLBAR_ACCESS_TOKEN)
 
-    def rollbar_except_hook(exc_type, exc_value, traceback):
-        rollbar.report_exc_info((exc_type, exc_value, traceback))
-        sys.__excepthook__(exc_type, exc_value, traceback)
+def rollbar_except_hook(exc_type, exc_value, traceback):
+    rollbar.report_exc_info((exc_type, exc_value, traceback))
+    sys.__excepthook__(exc_type, exc_value, traceback)
 
-    sys.excepthook = rollbar_except_hook
+
+sys.excepthook = rollbar_except_hook
 
 import requests
 import base64
@@ -143,16 +143,16 @@ def import_from_churchsuite():
         )
 
         event_data_blob = {
-            "Name": event["name"],
-            "Date & time": event["datetime"].isoformat(),
-            "Type": event["category"],
-            "ChurchSuite ID": str(event["id"]),
-            "ChurchSuite public identifier": event["identifier"],
-            "ChurchSuite Category ID": str(event["category_id"]),
+            AIRTABLE_MAP["name"]: event["name"],
+            AIRTABLE_MAP["datetime"]: event["datetime"].isoformat(),
+            AIRTABLE_MAP["type"]: event["category"],
+            AIRTABLE_MAP["churchsuite_id"]: str(event["id"]),
+            AIRTABLE_MAP["churchsuite_public_identifier"]: event["identifier"],
+            AIRTABLE_MAP["churchsuite_category_id"]: str(event["category_id"]),
         }
 
         if "image_url" in event:
-            event_data_blob["ChurchSuite Image"] = [
+            event_data_blob[AIRTABLE_MAP["churchsuite_image"]] = [
                 utils.attachment(event["image_url"])
             ]
 
@@ -330,9 +330,9 @@ def sync_with_youtube(update):
                     category_overrides["default_thumbnail"]
                 )
 
-        if "ChurchSuite Image" in service["fields"]:
+        if service_object.churchsuite_image_field:
             click.echo(click.style("Service-specific image found...", fg="blue"))
-            image_data = service["fields"]["ChurchSuite Image"][0]
+            image_data = service_object.churchsuite_image_field[0]
             image_url = image_data["url"]
             image_save_location = "images/service_specific/{}".format(
                 image_data["filename"]
@@ -456,6 +456,8 @@ def sync_with_wordpress(update):
     token = base64.b64encode(credentials.encode())
     header = {"Authorization": "Basic " + token.decode("utf-8")}
 
+    previous_service = None
+
     for service in services_to_stream:
 
         service_object = Service(service)
@@ -499,8 +501,8 @@ def sync_with_wordpress(update):
             resource_body = {
                 "title": service_object.title_string,
                 "slug": service_object.slug,
-                "date": (
-                    service_object.datetime - datetime.timedelta(days=1)
+                "date": service_object.datetime_to_publish_order_of_service_given_previous_service(
+                    previous_service
                 ).isoformat(),
                 "acf": {
                     "datetime": service_object.datetime_as_naive_string,
@@ -514,12 +516,12 @@ def sync_with_wordpress(update):
                 resource_body["acf"]["youtube"] = service_object.youtube_id
                 resource_body["acf"]["streamed"] = True
 
-            if "Wordpress featured image ID" in service["fields"]:
-                featured_image_id = service["fields"]["Wordpress featured image ID"]
+            if service_object.wordpress_image_id:
+                featured_image_id = service_object.wordpress_image_id
 
-            if "ChurchSuite Image" in service["fields"]:
+            if service_object.churchsuite_image_field:
                 click.echo(click.style("Service-specific image found...", fg="blue"))
-                image_data = service["fields"]["ChurchSuite Image"][0]
+                image_data = service_object.churchsuite_image_field[0]
                 image_url = image_data["url"]
                 image_save_location = "images/service_specific/{}".format(
                     image_data["filename"]
@@ -543,18 +545,20 @@ def sync_with_wordpress(update):
 
                 # If this is a service-specific image, it might have changed. Compare!
                 if (
-                    "ChurchSuite Image" in service["fields"]
-                    and "Last uploaded image name" in service["fields"]
+                    service_object.churchsuite_image_field
+                    and service_object.wordpress_image_last_uploaded_name
                 ):
 
                     click.echo("Featured image is service-specific")
 
                     # Get the resource metadata, so we can compare the filename
 
-                    last_uploaded_file = service["fields"]["Last uploaded image name"]
-                    image_filename_from_airtable = service["fields"][
-                        "ChurchSuite Image"
-                    ][0]["filename"]
+                    last_uploaded_file = (
+                        service_object.wordpress_image_last_uploaded_name
+                    )
+                    image_filename_from_airtable = (
+                        service_object.churchsuite_image_field[0]["filename"]
+                    )
 
                     if last_uploaded_file == image_filename_from_airtable:
                         # This is the same image idenfitier, so just poke the metadata
@@ -599,8 +603,10 @@ def sync_with_wordpress(update):
                             services_table.update(
                                 service_object.id,
                                 {
-                                    "Wordpress featured image ID": str(response["id"]),
-                                    "Last uploaded image name": image_filename_from_airtable,
+                                    AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
+                                    AIRTABLE_MAP[
+                                        "wp_image_last_uploaded_name"
+                                    ]: image_filename_from_airtable,
                                 },
                             )
                             resource_body["featured_media"] = response["id"]
@@ -624,7 +630,7 @@ def sync_with_wordpress(update):
                     "image/jpg",
                 )
 
-                media_resource_body["slug"] = service["fields"]["ChurchSuite Image"][0][
+                media_resource_body["slug"] = service_object.churchsuite_image_field[0][
                     "filename"
                 ].split(".")[0]
 
@@ -640,8 +646,8 @@ def sync_with_wordpress(update):
                     services_table.update(
                         service_object.id,
                         {
-                            "Wordpress featured image ID": str(response["id"]),
-                            "Last uploaded image name": fileName,
+                            AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
+                            AIRTABLE_MAP["wp_image_last_uploaded_name"]: fileName,
                         },
                     )
                     resource_body["featured_media"] = response["id"]
@@ -734,6 +740,8 @@ def sync_with_wordpress(update):
                     click.echo(
                         click.style("In preview mode, skipping creation", fg="yellow")
                     )
+
+        previous_service = service_object
 
     click.echo(click.style("Done!", fg="green"))
 
