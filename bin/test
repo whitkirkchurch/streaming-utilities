@@ -131,6 +131,46 @@ class testService(unittest.TestCase):
             datetime(2022, 1, 1, 10, 0, 0),
         )
 
+    def test_datetime_to_publish_order_of_service_given_previous_service_is_none(self):
+
+        service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-02T10:00:00.000Z"})
+        self.assertEqual(
+            service.datetime_to_publish_order_of_service_given_previous_service(
+                None
+            ).replace(tzinfo=None),
+            datetime(2022, 1, 1, 10, 0, 0),
+        )
+
+    def test_datetime_to_publish_order_of_service_given_previous_service_is_over_24h(
+        self,
+    ):
+
+        previous_service = serviceFactory(
+            {AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"}
+        )
+        service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-03T10:00:00.000Z"})
+        self.assertEqual(
+            service.datetime_to_publish_order_of_service_given_previous_service(
+                previous_service
+            ).replace(tzinfo=None),
+            datetime(2022, 1, 2, 10, 0, 0),
+        )
+
+    def test_datetime_to_publish_order_of_service_given_previous_service_is_within_24h(
+        self,
+    ):
+
+        previous_service = serviceFactory(
+            {AIRTABLE_MAP["datetime"]: "2022-01-02T10:00:00.000Z"}
+        )
+        service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-02T18:00:00.000Z"})
+        self.assertEqual(
+            service.datetime_to_publish_order_of_service_given_previous_service(
+                previous_service
+            ).replace(tzinfo=None),
+            datetime(2022, 1, 2, 11, 0, 0),
+        )
+
     def test_streaming_field(self):
 
         service = serviceFactory({AIRTABLE_MAP["streaming"]: "Yes"})

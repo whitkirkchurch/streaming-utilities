@@ -456,6 +456,8 @@ def sync_with_wordpress(update):
     token = base64.b64encode(credentials.encode())
     header = {"Authorization": "Basic " + token.decode("utf-8")}
 
+    previous_service = None
+
     for service in services_to_stream:
 
         service_object = Service(service)
@@ -499,7 +501,9 @@ def sync_with_wordpress(update):
             resource_body = {
                 "title": service_object.title_string,
                 "slug": service_object.slug,
-                "date": service_object.datetime_to_publish_order_of_service.isoformat(),
+                "date": service_object.datetime_to_publish_order_of_service_given_previous_service(
+                    previous_service
+                ).isoformat(),
                 "acf": {
                     "datetime": service_object.datetime_as_naive_string,
                     "physical": True,
@@ -736,6 +740,8 @@ def sync_with_wordpress(update):
                     click.echo(
                         click.style("In preview mode, skipping creation", fg="yellow")
                     )
+
+        previous_service = service_object
 
     click.echo(click.style("Done!", fg="green"))
 

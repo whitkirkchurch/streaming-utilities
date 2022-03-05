@@ -217,3 +217,15 @@ class Service:
             "streaming": self.is_streaming,
             "fee_payable": self.is_fee_payable,
         }
+
+    def datetime_to_publish_order_of_service_given_previous_service(
+        self, previous_service=None
+    ):
+
+        if previous_service:
+            return max(
+                self.datetime_to_publish_order_of_service,
+                previous_service.datetime + datetime.timedelta(hours=1),
+            )
+
+        return self.datetime_to_publish_order_of_service
