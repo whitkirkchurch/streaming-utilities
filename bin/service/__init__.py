@@ -15,6 +15,7 @@ AIRTABLE_MAP = {
     "churchsuite_public_identifier": "ChurchSuite public identifier",
     "datetime": "Date & time",
     "fee_payable": "Fee payable?",
+    "has_oos": "Has order of service?",
     "liturgical_name": "Liturgical name",
     "name": "Name",
     "oos_id": "Order of Service ID",
@@ -146,6 +147,13 @@ class Service:
     @property
     def is_stream_public(self):
         if self.airtable_fields.get(AIRTABLE_MAP["stream_public"]):
+            return True
+
+        return False
+
+    @property
+    def has_oos(self):
+        if self.airtable_fields.get(AIRTABLE_MAP["has_oos"]):
             return True
 
         return False
