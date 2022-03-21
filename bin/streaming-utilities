@@ -343,10 +343,16 @@ def sync_with_youtube(update):
 
         # Actually build objects and perform updates
 
-        # Build up the description
+        # Set the privacy
 
         if service_object.is_stream_public:
             youtube_privacy = "public"
+        else:
+            youtube_privacy = "unlisted"
+
+        # Build up the description
+
+        if service_object.has_oos:
             youtube_description = (
                 service_object.description
                 + "\r\n\r\n"
@@ -355,7 +361,6 @@ def sync_with_youtube(update):
                 )
             )
         else:
-            youtube_privacy = "unlisted"
             youtube_description = service_object.description
 
         try:
@@ -462,8 +467,8 @@ def sync_with_wordpress(update):
 
         service_object = Service(service)
 
-        # We only generate OOS for public streams
-        if service_object.is_stream_public:
+        # We only generate OOS for public streams with an order of service
+        if service_object.is_stream_public and service_object.has_oos:
 
             click.echo(service_object.title_string)
 
