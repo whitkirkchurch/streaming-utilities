@@ -443,8 +443,8 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "3.8.12"
-content-hash = "19e06e927544ca5682bb4e1207a5f45220de869c992eff52c2bde14037d4e9d2"
+python-versions = "3.10.3"
+content-hash = "7a5b62a5381c8b49804dd62e0145ae5959f23aee985efa11d090cc50a0fe57c4"
 
 [metadata.files]
 boto3 = [
