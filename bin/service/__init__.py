@@ -28,6 +28,7 @@ AIRTABLE_MAP = {
     "wp_image_id": "Wordpress featured image ID",
     "wp_image_last_uploaded_name": "Last uploaded Wordpress image name",
     "youtube_id": "YouTube ID",
+    "youtube_image_last_uploaded_name": "Last uploaded YouTube thumbnail name",
 }
 
 CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
@@ -111,6 +112,12 @@ class Service:
     @property
     def youtube_id(self):
         return self.airtable_fields.get(AIRTABLE_MAP["youtube_id"])
+
+    @property
+    def youtube_image_last_uploaded_name(self):
+        return self.airtable_fields.get(
+            AIRTABLE_MAP["youtube_image_last_uploaded_name"]
+        )
 
     @property
     def datetime(self):
