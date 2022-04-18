@@ -25,6 +25,8 @@ import botocore
 import boto3
 import click
 
+import churchsuite
+
 import datetime
 import pytz
 
@@ -89,7 +91,7 @@ def utilities():
 @utilities.command()
 def import_from_churchsuite():
 
-    click.echo(click.style("Importing from ChurchSuite", fg="blue"))
+    cs = churchsuite.Account(CHURCHSUITE_ACCOUNT)
 
     click.echo(click.style("Loading events from ChurchSuite…", fg="blue"))
 
@@ -99,32 +101,27 @@ def import_from_churchsuite():
         )
     )
 
-    params = {"category_ids": ",".join(CHURCHSUITE_CATEGORIES_TO_SYNC)}
-
-    resp = requests.get(url=featured_events_url, params=params)
-    churchsuite_events = resp.json()
+    churchsuite_events = cs.get_public_events(
+        {"category_ids": ",".join(CHURCHSUITE_CATEGORIES_TO_SYNC)}
+    )
 
     events_to_sync = {}
 
     for event in churchsuite_events:
 
-        parsed_date = TZ_LONDON.localize(
-            datetime.datetime.strptime(event["datetime_start"], "%Y-%m-%d %H:%M:%S")
-        )
-
-        event_id = str(event["id"])
+        event_id = str(event.id)
 
         events_to_sync[event_id] = {
             "id": event_id,
-            "identifier": event["identifier"],
-            "name": event["name"],
-            "datetime": parsed_date,
-            "category": event["category"]["name"],
-            "category_id": event["category"]["id"],
+            "identifier": event.object["identifier"],
+            "name": event.object["name"],
+            "datetime": event.localised_datetime_start,
+            "category": event.object["category"]["name"],
+            "category_id": event.object["category"]["id"],
         }
 
-        if event["images"]:
-            events_to_sync[event_id]["image_url"] = event["images"]["lg"]["url"]
+        if event.object["images"]:
+            events_to_sync[event_id]["image_url"] = event.object["images"]["lg"]["url"]
 
     table = Table(AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID)
 
