@@ -15,11 +15,11 @@ A collection of useful utilities which make the lives of our streaming team easi
         YT[YouTube streams]
         E[Email reports]
         
-        CS --> AT
-        AT --> OOS
-        AT --> POD
-        AT --> YT
-        AT --> E
+        CS --> |import-from-churchsuite| AT
+        AT --> |sync-with-wordpress| OOS
+        AT --> |sync-with-wordpress| POD
+        AT --> |sync-with-youtube| YT
+        AT --> |send-report| E
 ```
 
 ## Actions
