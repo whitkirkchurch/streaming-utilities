@@ -26,7 +26,7 @@ AIRTABLE_MAP = {
     "technician": "Technician",
     "type": "Type",
     "wp_image_id": "Wordpress featured image ID",
-    "wp_image_last_uploaded_name": "Last uploaded image name",
+    "wp_image_last_uploaded_name": "Last uploaded Wordpress image name",
     "youtube_id": "YouTube ID",
 }
 
