@@ -302,7 +302,7 @@ def sync_with_youtube(update):
 
         # Establish service defaults
 
-        service_image = None
+        service_image = "images/default_thumbnails/service.jpg"
 
         # Apply category-specific overrides
 
