@@ -95,12 +95,6 @@ def import_from_churchsuite():
 
     click.echo(click.style("Loading events from ChurchSuite…", fg="blue"))
 
-    featured_events_url = (
-        "https://{churchsuite_account_id}.churchsuite.co.uk/embed/calendar/json".format(
-            churchsuite_account_id=CHURCHSUITE_ACCOUNT
-        )
-    )
-
     churchsuite_events = cs.get_public_events(
         {"category_ids": ",".join(CHURCHSUITE_CATEGORIES_TO_SYNC)}
     )
