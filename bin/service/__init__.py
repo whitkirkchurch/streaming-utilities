@@ -244,3 +244,17 @@ class Service:
             )
 
         return self.datetime_to_publish_order_of_service
+
+    @property
+    def has_category_behaviour_overrides(self):
+        if self.churchsuite_category_id in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES:
+            return True
+        return False
+
+    @property
+    def category_behaviour_overrides(self):
+        if self.has_category_behaviour_overrides:
+            return CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
+                self.churchsuite_category_id
+            ]
+        return None

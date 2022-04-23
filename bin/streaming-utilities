@@ -39,7 +39,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from service import Service, AIRTABLE_MAP, CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
+from service import Service, AIRTABLE_MAP
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -308,19 +308,12 @@ def sync_with_youtube(update):
 
         # Apply category-specific overrides
 
-        if (
-            service_object.churchsuite_category_id
-            in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
-        ):
+        if service_object.has_category_behaviour_overrides:
             print("Overriding service defaults for category")
 
-            category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                service_object.churchsuite_category_id
-            ]
-
-            if "default_thumbnail" in category_overrides:
+            if "default_thumbnail" in service_object.category_behaviour_overrides:
                 service_image = "images/default_thumbnails/{}".format(
-                    category_overrides["default_thumbnail"]
+                    service_object.category_behaviour_overrides["default_thumbnail"]
                 )
 
         if service_object.churchsuite_image_field:
@@ -509,28 +502,31 @@ def sync_with_wordpress(update):
 
             # Apply category-specific overrides
 
-            if (
-                service_object.churchsuite_category_id
-                in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
-            ):
+            if service_object.has_category_behaviour_overrides:
                 print("Overriding service defaults for category")
 
-                category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                    service_object.churchsuite_category_id
-                ]
-
-                if "default_thumbnail" in category_overrides:
+                if "default_thumbnail" in service_object.category_behaviour_overrides:
                     service_image = "images/default_thumbnails/{}".format(
-                        category_overrides["default_thumbnail"]
+                        service_object.category_behaviour_overrides["default_thumbnail"]
                     )
 
-                if "default_featured_image_id" in category_overrides:
-                    featured_image_id = category_overrides["default_featured_image_id"]
-
-                if "show_bcp_reproduction_notice" in category_overrides:
-                    show_bcp_reproduction_notice = category_overrides[
-                        "show_bcp_reproduction_notice"
+                if (
+                    "default_featured_image_id"
+                    in service_object.category_behaviour_overrides
+                ):
+                    featured_image_id = service_object.category_behaviour_overrides[
+                        "default_featured_image_id"
                     ]
+
+                if (
+                    "show_bcp_reproduction_notice"
+                    in service_object.category_behaviour_overrides
+                ):
+                    show_bcp_reproduction_notice = (
+                        service_object.category_behaviour_overrides[
+                            "show_bcp_reproduction_notice"
+                        ]
+                    )
 
             resource_body = {
                 "title": service_object.title_string,
