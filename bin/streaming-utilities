@@ -302,7 +302,7 @@ def sync_with_youtube(update):
 
         # Establish service defaults
 
-        service_image = None
+        service_image = "images/default_thumbnails/service.jpg"
 
         # Apply category-specific overrides
 
@@ -411,17 +411,35 @@ def sync_with_youtube(update):
 
             if service_image:
 
-                if update:
-                    click.echo("Updating YouTube thumbnail...")
-                    thumb_request = youtube.thumbnails().set(
-                        videoId=response["id"],
-                        media_body=MediaFileUpload(service_image),
-                    )
-                    thumb_request.execute()
-                else:
-                    click.echo(
-                        click.style("In preview mode, skipping thumbnail", fg="yellow")
-                    )
+                # Get the resource metadata, so we can compare the filename
+
+                last_uploaded_file = service_object.youtube_image_last_uploaded_name
+
+                if last_uploaded_file != service_image:
+
+                    click.echo("Image has changed, replacing")
+
+                    if update:
+                        click.echo("Updating YouTube thumbnail...")
+                        thumb_request = youtube.thumbnails().set(
+                            videoId=response["id"],
+                            media_body=MediaFileUpload(service_image),
+                        )
+                        thumb_request.execute()
+                        services_table.update(
+                            service_object.id,
+                            {
+                                AIRTABLE_MAP[
+                                    "youtube_image_last_uploaded_name"
+                                ]: service_image,
+                            },
+                        )
+                    else:
+                        click.echo(
+                            click.style(
+                                "In preview mode, skipping thumbnail", fg="yellow"
+                            )
+                        )
 
         except googleapiclient.errors.HttpError as err:
             print(err)
