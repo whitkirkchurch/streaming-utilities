@@ -63,6 +63,8 @@ MAIL_TO_ADDRESS = os.environ["MAIL_TO_ADDRESS"]
 
 YOUTUBE_STREAM_ID = os.environ["YOUTUBE_STREAM_ID"]
 
+YOUTUBE_NONPROFIT_CATEGORY_ID = "29"
+
 GOOGLE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRET_FILE = "client_secret.json"
 GOOGLE_CREDENTIALS_FILE = "token.json"
@@ -394,10 +396,27 @@ def sync_with_youtube(update):
                     service_object.id, {AIRTABLE_MAP["youtube_id"]: response["id"]}
                 )
 
+                # Bind the liveBroadcast to our standard stream ID
                 request = youtube.liveBroadcasts().bind(
                     part="id",
                     id=response["id"],
                     streamId=YOUTUBE_STREAM_ID,
+                )
+
+                response = request.execute()
+
+                # Poke an update to the Video object for things the liveBroadcast won't update
+
+                request = youtube.videos().update(
+                    part="snippet,status",
+                    body={
+                        "id": response["id"],
+                        "snippet": {
+                            "categoryId": YOUTUBE_NONPROFIT_CATEGORY_ID,
+                            "title": service_object.title_string_with_date,
+                        },
+                        "status": {"selfDeclaredMadeForKids": False},
+                    },
                 )
 
                 response = request.execute()
