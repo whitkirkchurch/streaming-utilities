@@ -353,6 +353,89 @@ class testService(unittest.TestCase):
             {"default_thumbnail": "test.jpg"},
         )
 
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    def test_youtube_playlists_for_service_with_no_overrides(self):
+
+        service = serviceFactory({})
+
+        self.assertEqual(len(service.youtube_playlists_for_service), 1)
+        self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
+
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch(
+        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {"123": {"youtube_playlists": {"ExTrApLaYlIsT"}}},
+    )
+    def test_youtube_playlists_for_service_with_additional_category(self):
+
+        service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
+
+        self.assertEqual(len(service.youtube_playlists_for_service), 2)
+        self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
+        self.assertIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
+
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch(
+        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {
+            "123": {
+                "exclude_youtube_playlists": {"PlAyLiStId"},
+            }
+        },
+    )
+    def test_youtube_playlists_for_service_with_exclude_category(self):
+
+        service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
+
+        self.assertEqual(len(service.youtube_playlists_for_service), 0)
+        self.assertNotIn("PlAyLiStId", service.youtube_playlists_for_service)
+
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch(
+        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {
+            "123": {
+                "youtube_playlists": {"ExTrApLaYlIsT"},
+                "exclude_youtube_playlists": {"PlAyLiStId"},
+            }
+        },
+    )
+    def test_youtube_playlists_for_service_with_additional_and_exclude_category(self):
+
+        service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
+
+        self.assertEqual(len(service.youtube_playlists_for_service), 1)
+        self.assertNotIn("PlAyLiStId", service.youtube_playlists_for_service)
+        self.assertIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
+
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch(
+        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {
+            "123": {
+                "youtube_playlists": {"ExTrApLaYlIsT"},
+                "exclude_youtube_playlists": {"ExTrApLaYlIsT"},
+            }
+        },
+    )
+    def test_youtube_playlists_for_service_exclude_takes_precedence(self):
+
+        service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
+
+        self.assertNotIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
+
+    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch(
+        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {"123": {"youtube_playlists": {"PlAyLiStId"}}},
+    )
+    def test_youtube_playlists_for_service_deduplicates(self):
+
+        service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
+
+        self.assertEqual(len(service.youtube_playlists_for_service), 1)
+        self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
+
 
 if __name__ == "__main__":
     unittest.main()

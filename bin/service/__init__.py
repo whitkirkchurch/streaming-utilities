@@ -42,6 +42,8 @@ CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
     },
 }
 
+YOUTUBE_DEFAULT_PLAYLIST_ID = "PLQl3S_pmB65sll8wZSQY-c5BXFzrygV1P"
+
 TZ_GMT = pytz.timezone("Etc/GMT")
 TZ_LONDON = pytz.timezone("Europe/London")
 
@@ -258,3 +260,23 @@ class Service:
                 self.churchsuite_category_id
             ]
         return None
+
+    @property
+    def youtube_playlists_for_service(self):
+        playlists = {
+            YOUTUBE_DEFAULT_PLAYLIST_ID,
+        }
+
+        if self.has_category_behaviour_overrides:
+
+            if "youtube_playlists" in self.category_behaviour_overrides:
+                playlists = playlists.union(
+                    self.category_behaviour_overrides["youtube_playlists"]
+                )
+
+            if "exclude_youtube_playlists" in self.category_behaviour_overrides:
+                playlists = playlists.difference(
+                    self.category_behaviour_overrides["exclude_youtube_playlists"]
+                )
+
+        return playlists
