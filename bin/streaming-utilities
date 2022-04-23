@@ -414,6 +414,7 @@ def sync_with_youtube(update):
                         "snippet": {
                             "categoryId": YOUTUBE_NONPROFIT_CATEGORY_ID,
                             "title": service_object.title_string_with_date,
+                            "description": youtube_description,
                         },
                         "status": {"selfDeclaredMadeForKids": False},
                     },
