@@ -294,3 +294,10 @@ class Service:
             return True
         else:
             return False
+
+    @property
+    def youtube_privacy(self):
+        if self.is_stream_public:
+            return "public"
+        else:
+            return "unlisted"

@@ -447,6 +447,16 @@ class testService(unittest.TestCase):
 
         self.assertFalse(service_public_no.youtube_is_embeddable)
 
+    def test_youtube_privacy(self):
+
+        service_public_yes = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
+
+        service_public_no = serviceFactory({})
+
+        self.assertEqual(service_public_yes.youtube_privacy, "public")
+
+        self.assertEqual(service_public_no.youtube_privacy, "unlisted")
+
 
 class testYoutubePlaylist(unittest.TestCase):
     @patch("youtube.Api")
