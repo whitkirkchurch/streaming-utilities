@@ -360,10 +360,6 @@ def sync_with_youtube(update):
                     "title": service_object.title_string_with_date,
                     "description": youtube_description,
                 },
-                "status": {
-                    "privacyStatus": youtube_privacy,
-                    "selfDeclaredMadeForKids": False,
-                },
             }
 
             if service_object.youtube_id:
@@ -413,6 +409,7 @@ def sync_with_youtube(update):
                             "description": youtube_description,
                         },
                         "status": {
+                            "privacyStatus": youtube_privacy,
                             "selfDeclaredMadeForKids": False,
                             "embeddable": service_object.youtube_is_embeddable,
                         },
