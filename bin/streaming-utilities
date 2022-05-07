@@ -40,6 +40,7 @@ import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
 from service import Service, AIRTABLE_MAP
+from youtube import PlaylistManager
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -83,6 +84,8 @@ s3 = boto3.resource(
     "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET
 )
 bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+youtube_playlist_manager = PlaylistManager()
 
 
 @click.group(chain=True)
@@ -457,6 +460,40 @@ def sync_with_youtube(update):
                             )
                         )
 
+            # Now, add to playlists!
+            for playlist in service_object.youtube_playlists_for_service:
+
+                if update:
+
+                    if not video_in_playlist(response["id"], playlist):
+                        click.echo("Adding to playlist {}...".format(playlist))
+                        playlist_request = youtube.playlistItems().insert(
+                            part="snippet",
+                            body={
+                                "snippet": {
+                                    "playlistId": playlist,
+                                    "resourceId": {
+                                        "kind": "youtube#video",
+                                        "videoId": response["id"],
+                                    },
+                                }
+                            },
+                        )
+                        playlist_request.execute()
+
+                    else:
+                        click.echo(
+                            click.style(
+                                f"Video already in playlist {playlist}", fg="yellow"
+                            )
+                        )
+                else:
+                    click.echo(
+                        click.style(
+                            "In preview mode, skipping add to playlist", fg="yellow"
+                        )
+                    )
+
         except googleapiclient.errors.HttpError as err:
             print(err)
 
@@ -777,6 +814,14 @@ def sync_with_wordpress(update):
         previous_service = service_object
 
     click.echo(click.style("Done!", fg="green"))
+
+
+def video_in_playlist(video_id, playlist_id):
+    playlist = youtube_playlist_manager.get(playlist_id)
+
+    click.echo(click.style(f"Checking if {video_id} in {playlist_id}", fg="blue"))
+
+    return video_id in playlist.items
 
 
 def get_upcoming_streaming_services(services_table):

@@ -6,6 +6,7 @@ from unittest.mock import patch
 from datetime import datetime
 
 from service import AIRTABLE_MAP, Service
+from youtube import Playlist, PlaylistManager
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
@@ -445,6 +446,26 @@ class testService(unittest.TestCase):
         self.assertTrue(service_public_yes.youtube_is_embeddable)
 
         self.assertFalse(service_public_no.youtube_is_embeddable)
+
+
+class testYoutubePlaylistManager(unittest.TestCase):
+    @patch("youtube.Api")
+    def test_returns_playlist(self, *args):
+
+        manager = PlaylistManager()
+
+        self.assertIsInstance(manager.get("PlAyLiSt"), Playlist)
+
+    @patch("youtube.Api")
+    def test_returns_existing_instance_for_list_where_present(self, *args):
+
+        manager = PlaylistManager()
+
+        playlist_1 = manager.get("PlAyLiSt")
+        playlist_2 = manager.get("PlAyLiSt")
+
+        self.assertEqual(id(playlist_1), id(playlist_2))
+
 
 if __name__ == "__main__":
     unittest.main()
