@@ -21,7 +21,7 @@ AWS_SECRET = os.environ["AWS_SECRET"]
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
-class Api:
+class Api:  # pragma: no cover
     def __init__(self):
         api_service_name = "youtube"
 
@@ -87,23 +87,32 @@ class Playlist:
 
     def load_list_items(self, pagination_token=None):
 
-        request = self.youtube.client.playlistItems().list(
-            part="snippet",
-            maxResults=50,
-            playlistId=self.playlist_id,
-            pageToken=pagination_token,
-        )
+        items_to_load = True
+        video_list = []
 
-        response = request.execute()
+        while items_to_load:
 
-        for item in response["items"]:
-            resource = item["snippet"]["resourceId"]
+            request = self.youtube.client.playlistItems().list(
+                part="snippet",
+                maxResults=50,
+                playlistId=self.playlist_id,
+                pageToken=pagination_token,
+            )
 
-            if resource["kind"] == "youtube#video":
-                self.videos_in_list.append(resource["videoId"])
+            response = request.execute()
 
-        if "nextPageToken" in response:
-            self.load_list_items(response["nextPageToken"])
+            for item in response["items"]:
+                resource = item["snippet"]["resourceId"]
+
+                if resource["kind"] == "youtube#video":
+                    video_list.append(resource["videoId"])
+
+            if "nextPageToken" in response:
+                pagination_token = response["nextPageToken"]
+            else:
+                items_to_load = False
+
+        self.videos_in_list = video_list
 
     @property
     def items(self):
