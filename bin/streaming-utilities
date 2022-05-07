@@ -334,11 +334,6 @@ def sync_with_youtube(update):
 
         # Set the privacy
 
-        if service_object.is_stream_public:
-            youtube_privacy = "public"
-        else:
-            youtube_privacy = "unlisted"
-
         # Build up the description
 
         if service_object.has_oos:
@@ -359,6 +354,9 @@ def sync_with_youtube(update):
                     "scheduledStartTime": service_object.datetime.isoformat(),
                     "title": service_object.title_string_with_date,
                     "description": youtube_description,
+                },
+                "status": {
+                    "privacyStatus": service_object.youtube_privacy,
                 },
             }
 
@@ -409,7 +407,7 @@ def sync_with_youtube(update):
                             "description": youtube_description,
                         },
                         "status": {
-                            "privacyStatus": youtube_privacy,
+                            "privacyStatus": service_object.youtube_privacy,
                             "selfDeclaredMadeForKids": False,
                             "embeddable": service_object.youtube_is_embeddable,
                         },
