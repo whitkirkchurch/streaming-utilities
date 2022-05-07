@@ -409,7 +409,10 @@ def sync_with_youtube(update):
                             "title": service_object.title_string_with_date,
                             "description": youtube_description,
                         },
-                        "status": {"selfDeclaredMadeForKids": False},
+                        "status": {
+                            "selfDeclaredMadeForKids": False,
+                            "embeddable": service_object.youtube_is_embeddable,
+                        },
                     },
                 )
 

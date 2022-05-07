@@ -280,3 +280,10 @@ class Service:
                 )
 
         return playlists
+
+    @property
+    def youtube_is_embeddable(self):
+        if self.is_stream_public:
+            return True
+        else:
+            return False

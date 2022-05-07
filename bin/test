@@ -436,6 +436,15 @@ class testService(unittest.TestCase):
         self.assertEqual(len(service.youtube_playlists_for_service), 1)
         self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
 
+    def test_youtube_is_embeddable(self):
+
+        service_public_yes = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
+
+        service_public_no = serviceFactory({})
+
+        self.assertTrue(service_public_yes.youtube_is_embeddable)
+
+        self.assertFalse(service_public_no.youtube_is_embeddable)
 
 if __name__ == "__main__":
     unittest.main()
