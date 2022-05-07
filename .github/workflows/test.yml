@@ -24,6 +24,9 @@ jobs:
         env:
           AIRTABLE_BASE_ID: baseTeStBaSe
           AIRTABLE_SERVICES_TABLE_ID: tableTeStSeRvIcEs
+          AWS_S3_BUCKET_NAME: test-bucket
+          AWS_ACCESS_KEY_ID: test-key-id
+          AWS_SECRET: test-secret
 
       - name: Process coverage
         run: poetry run coverage xml
