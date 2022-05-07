@@ -39,7 +39,8 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from service import Service, AIRTABLE_MAP, CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
+from service import Service, AIRTABLE_MAP
+from youtube import PlaylistManager
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -83,6 +84,8 @@ s3 = boto3.resource(
     "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET
 )
 bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+youtube_playlist_manager = PlaylistManager()
 
 
 @click.group(chain=True)
@@ -308,19 +311,12 @@ def sync_with_youtube(update):
 
         # Apply category-specific overrides
 
-        if (
-            service_object.churchsuite_category_id
-            in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
-        ):
+        if service_object.has_category_behaviour_overrides:
             print("Overriding service defaults for category")
 
-            category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                service_object.churchsuite_category_id
-            ]
-
-            if "default_thumbnail" in category_overrides:
+            if "default_thumbnail" in service_object.category_behaviour_overrides:
                 service_image = "images/default_thumbnails/{}".format(
-                    category_overrides["default_thumbnail"]
+                    service_object.category_behaviour_overrides["default_thumbnail"]
                 )
 
         if service_object.churchsuite_image_field:
@@ -363,10 +359,6 @@ def sync_with_youtube(update):
                     "scheduledStartTime": service_object.datetime.isoformat(),
                     "title": service_object.title_string_with_date,
                     "description": youtube_description,
-                },
-                "status": {
-                    "privacyStatus": youtube_privacy,
-                    "selfDeclaredMadeForKids": False,
                 },
             }
 
@@ -416,7 +408,11 @@ def sync_with_youtube(update):
                             "title": service_object.title_string_with_date,
                             "description": youtube_description,
                         },
-                        "status": {"selfDeclaredMadeForKids": False},
+                        "status": {
+                            "privacyStatus": youtube_privacy,
+                            "selfDeclaredMadeForKids": False,
+                            "embeddable": service_object.youtube_is_embeddable,
+                        },
                     },
                 )
 
@@ -460,6 +456,40 @@ def sync_with_youtube(update):
                                 "In preview mode, skipping thumbnail", fg="yellow"
                             )
                         )
+
+            # Now, add to playlists!
+            for playlist in service_object.youtube_playlists_for_service:
+
+                if update:
+
+                    if not video_in_playlist(response["id"], playlist):
+                        click.echo("Adding to playlist {}...".format(playlist))
+                        playlist_request = youtube.playlistItems().insert(
+                            part="snippet",
+                            body={
+                                "snippet": {
+                                    "playlistId": playlist,
+                                    "resourceId": {
+                                        "kind": "youtube#video",
+                                        "videoId": response["id"],
+                                    },
+                                }
+                            },
+                        )
+                        playlist_request.execute()
+
+                    else:
+                        click.echo(
+                            click.style(
+                                f"Video already in playlist {playlist}", fg="yellow"
+                            )
+                        )
+                else:
+                    click.echo(
+                        click.style(
+                            "In preview mode, skipping add to playlist", fg="yellow"
+                        )
+                    )
 
         except googleapiclient.errors.HttpError as err:
             print(err)
@@ -509,28 +539,31 @@ def sync_with_wordpress(update):
 
             # Apply category-specific overrides
 
-            if (
-                service_object.churchsuite_category_id
-                in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES
-            ):
+            if service_object.has_category_behaviour_overrides:
                 print("Overriding service defaults for category")
 
-                category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
-                    service_object.churchsuite_category_id
-                ]
-
-                if "default_thumbnail" in category_overrides:
+                if "default_thumbnail" in service_object.category_behaviour_overrides:
                     service_image = "images/default_thumbnails/{}".format(
-                        category_overrides["default_thumbnail"]
+                        service_object.category_behaviour_overrides["default_thumbnail"]
                     )
 
-                if "default_featured_image_id" in category_overrides:
-                    featured_image_id = category_overrides["default_featured_image_id"]
-
-                if "show_bcp_reproduction_notice" in category_overrides:
-                    show_bcp_reproduction_notice = category_overrides[
-                        "show_bcp_reproduction_notice"
+                if (
+                    "default_featured_image_id"
+                    in service_object.category_behaviour_overrides
+                ):
+                    featured_image_id = service_object.category_behaviour_overrides[
+                        "default_featured_image_id"
                     ]
+
+                if (
+                    "show_bcp_reproduction_notice"
+                    in service_object.category_behaviour_overrides
+                ):
+                    show_bcp_reproduction_notice = (
+                        service_object.category_behaviour_overrides[
+                            "show_bcp_reproduction_notice"
+                        ]
+                    )
 
             resource_body = {
                 "title": service_object.title_string,
@@ -778,6 +811,14 @@ def sync_with_wordpress(update):
         previous_service = service_object
 
     click.echo(click.style("Done!", fg="green"))
+
+
+def video_in_playlist(video_id, playlist_id):
+    playlist = youtube_playlist_manager.get(playlist_id)
+
+    click.echo(click.style(f"Checking if {video_id} in {playlist_id}", fg="blue"))
+
+    return video_id in playlist.items
 
 
 def get_upcoming_streaming_services(services_table):

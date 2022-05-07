@@ -31,14 +31,23 @@ AIRTABLE_MAP = {
     "youtube_image_last_uploaded_name": "Last uploaded YouTube thumbnail name",
 }
 
+YOUTUBE_DEFAULT_PLAYLIST_ID = "PLQl3S_pmB65sll8wZSQY-c5BXFzrygV1P"
+
 CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
-    "9": {"default_thumbnail": "wedding.jpg"},
-    "10": {"default_thumbnail": "funeral.jpg"},
+    "9": {
+        "default_thumbnail": "wedding.jpg",
+        "exclude_youtube_playlists": {YOUTUBE_DEFAULT_PLAYLIST_ID},
+    },
+    "10": {
+        "default_thumbnail": "funeral.jpg",
+        "exclude_youtube_playlists": {YOUTUBE_DEFAULT_PLAYLIST_ID},
+    },
     "34": {
         "default_thumbnail": "evensong.jpg",
         "default_featured_image_id": "6899",
         "describe_service_as": "service of Choral Evensong",
         "show_bcp_reproduction_notice": True,
+        "youtube_playlists": {"PLQl3S_pmB65s3xbLEPgxkm9y-96UY6NrA"},
     },
 }
 
@@ -244,3 +253,44 @@ class Service:
             )
 
         return self.datetime_to_publish_order_of_service
+
+    @property
+    def has_category_behaviour_overrides(self):
+        if self.churchsuite_category_id in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES:
+            return True
+        return False
+
+    @property
+    def category_behaviour_overrides(self):
+        if self.has_category_behaviour_overrides:
+            return CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
+                self.churchsuite_category_id
+            ]
+        return None
+
+    @property
+    def youtube_playlists_for_service(self):
+        playlists = {
+            YOUTUBE_DEFAULT_PLAYLIST_ID,
+        }
+
+        if self.has_category_behaviour_overrides:
+
+            if "youtube_playlists" in self.category_behaviour_overrides:
+                playlists = playlists.union(
+                    self.category_behaviour_overrides["youtube_playlists"]
+                )
+
+            if "exclude_youtube_playlists" in self.category_behaviour_overrides:
+                playlists = playlists.difference(
+                    self.category_behaviour_overrides["exclude_youtube_playlists"]
+                )
+
+        return playlists
+
+    @property
+    def youtube_is_embeddable(self):
+        if self.is_stream_public:
+            return True
+        else:
+            return False
