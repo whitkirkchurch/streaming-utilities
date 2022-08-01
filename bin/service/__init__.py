@@ -49,6 +49,12 @@ CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
         "show_bcp_reproduction_notice": True,
         "youtube_playlists": {"PLQl3S_pmB65s3xbLEPgxkm9y-96UY6NrA"},
     },
+    "35": {
+        "default_thumbnail": "compline.jpg",
+        "default_featured_image_id": "9435",
+        "describe_service_as": "service of compline",
+        "youtube_playlists": {"PLQl3S_pmB65smkQbbFoGSITxQVtuqKXu3"},
+    },
 }
 
 TZ_GMT = pytz.timezone("Etc/GMT")
