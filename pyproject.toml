@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "3.10.5"
-pyairtable = "^1.0.0"
+pyairtable = "^1.2.0"
 click = "^8.0.3"
 Jinja2 = "^3.0.3"
 google-api-python-client = "^2.36.0"

@@ -273,7 +273,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pyairtable"
-version = "1.0.0.post1"
+version = "1.2.0"
 description = "Python Client for the Airtable API"
 category = "main"
 optional = false
@@ -444,7 +444,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.5"
-content-hash = "6f640eefd64e8b1b1571d27aced7b15cd6e6a6cd40be604526bb6c85467a6ffb"
+content-hash = "e6af50a844762e335601ec9ff30f0780fd137583edfd7b9d79dbf392eccbfd4c"
 
 [metadata.files]
 boto3 = [
@@ -663,8 +663,8 @@ protobuf = [
     {file = "protobuf-3.19.4.tar.gz", hash = "sha256:9df0c10adf3e83015ced42a9a7bd64e13d06c4cf45c340d2c63020ea04499d0a"},
 ]
 pyairtable = [
-    {file = "pyairtable-1.0.0.post1-py2.py3-none-any.whl", hash = "sha256:4132af74f96e185ed04ab5bb73c1b7fcccd0b6e1578e41af149f1b9c1383788c"},
-    {file = "pyairtable-1.0.0.post1.tar.gz", hash = "sha256:cfb5f26a2d5a75b3896428eb87def47427c3e570ac08bb61dec70927fe9b1117"},
+    {file = "pyairtable-1.2.0-py2.py3-none-any.whl", hash = "sha256:12fddba380e7ff5b0950616187dc865f1fadfb94c239a6eb71015b5bbe1fd392"},
+    {file = "pyairtable-1.2.0.tar.gz", hash = "sha256:d8a25e555ce43e91b3c072a1cbb5554f5934b05b300fddb97179f63d6e309d08"},
 ]
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.4.egg", hash = "sha256:fec3e9d8e36808a28efb59b489e4528c10ad0f480e57dcc32b4de5c9d8c9fdf3"},
