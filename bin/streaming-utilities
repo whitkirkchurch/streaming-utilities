@@ -75,6 +75,8 @@ WORDPRESS_BASE_URL = "https://whitkirkchurch.org.uk"
 WORDPRESS_USER = os.environ["WORDPRESS_USER"]
 WORDPRESS_APPLICATION_PASSWORD = os.environ["WORDPRESS_APPLICATION_PASSWORD"]
 
+WORDPRESS_DEFAULT_FEATURED_IMAGE_ID = os.environ["WORDPRESS_DEFAULT_FEATURED_IMAGE_ID"]
+
 AWS_S3_BUCKET_NAME = os.environ["AWS_S3_BUCKET_NAME"]
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET = os.environ["AWS_SECRET"]
@@ -534,17 +536,12 @@ def sync_with_wordpress(update):
 
             service_image = None
             show_bcp_reproduction_notice = False
-            featured_image_id = None
+            featured_image_id = WORDPRESS_DEFAULT_FEATURED_IMAGE_ID
 
             # Apply category-specific overrides
 
             if service_object.has_category_behaviour_overrides:
                 print("Overriding service defaults for category")
-
-                if "default_thumbnail" in service_object.category_behaviour_overrides:
-                    service_image = "images/default_thumbnails/{}".format(
-                        service_object.category_behaviour_overrides["default_thumbnail"]
-                    )
 
                 if (
                     "default_featured_image_id"
@@ -683,7 +680,21 @@ def sync_with_wordpress(update):
                                 )
                             )
 
-                resource_body["featured_media"] = int(featured_image_id)
+                else:
+
+                    # This featured image ID comes from a default somewhere.
+                    # Just push it to Airtable.
+
+                    click.echo("Image using default featured image ID")
+
+                    services_table.update(
+                        service_object.id,
+                        {
+                            AIRTABLE_MAP["wp_image_id"]: str(featured_image_id),
+                        },
+                    )
+
+                    resource_body["featured_media"] = int(featured_image_id)
 
             elif service_image:
 
