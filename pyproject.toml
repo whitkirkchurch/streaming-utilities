@@ -14,7 +14,7 @@ google-auth-oauthlib = "^0.5.2"
 boto3 = "^1.24.46"
 requests-toolbelt = "^0.9.1"
 rollbar = "^0.16.3"
-pytz = "^2022.1"
+pytz = "^2022.2"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", rev = "v0.1.0"}
 
 [tool.poetry.dev-dependencies]
