@@ -14,6 +14,7 @@ AIRTABLE_MAP = {
     "churchsuite_image": "ChurchSuite Image",
     "churchsuite_public_identifier": "ChurchSuite public identifier",
     "datetime": "Date & time",
+    "location": "Location",
     "fee_payable": "Fee payable?",
     "has_oos": "Has order of service?",
     "liturgical_name": "Liturgical name",
@@ -149,6 +150,10 @@ class Service:
         return self.datetime - datetime.timedelta(days=1)
 
     @property
+    def location(self):
+        return self.airtable_fields.get(AIRTABLE_MAP["location"])
+
+    @property
     def technician_name(self):
         if self.technician_field:
             return self.airtable_fields.get(AIRTABLE_MAP["technician"])["name"]
@@ -226,8 +231,14 @@ class Service:
         else:
             liturgical_name_description_string = ""
 
-        return "A {service_description} streamed live from St Mary's Church, Whitkirk{liturgical_string}.".format(
+        if self.location:
+            service_location = self.location
+        else:
+            service_location = "St Mary's Church, Whitkirk"
+
+        return "A {service_description} streamed live from {service_location}{liturgical_string}.".format(
             service_description=self.described_as,
+            service_location=service_location,
             liturgical_string=liturgical_name_description_string,
         )
 
