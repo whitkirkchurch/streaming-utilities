@@ -57,6 +57,7 @@ CHURCHSUITE_CATEGORIES_TO_SYNC = [
     "25",  # Easter
     "34",  # Choral Evensong
     "35",  # Compline
+    "36",  # Messy Church
 ]
 
 MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
