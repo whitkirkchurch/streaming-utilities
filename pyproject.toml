@@ -12,7 +12,7 @@ Jinja2 = "^3.1.2"
 google-api-python-client = "^2.64.0"
 google-auth-oauthlib = "^0.5.3"
 boto3 = "^1.24.72"
-requests-toolbelt = "^0.9.1"
+requests-toolbelt = "^0.10.0"
 rollbar = "^0.16.3"
 pytz = "^2022.4"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", rev = "v0.1.0"}
