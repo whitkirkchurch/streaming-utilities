@@ -1,13 +1,13 @@
 [[package]]
 name = "boto3"
-version = "1.24.72"
+version = "1.26.0"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.72,<1.28.0"
+botocore = ">=1.29.0,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -16,7 +16,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.72"
+version = "1.29.0"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -444,16 +444,16 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.5"
-content-hash = "efe57d0e7d37297aac0100cd8d08c39bace512ef851cc490e5e8271f5f88bdc4"
+content-hash = "c163681772a02e2f1de2281840166ab8a2db94a77013d3f9016da00e0509dfca"
 
 [metadata.files]
 boto3 = [
-    {file = "boto3-1.24.72-py3-none-any.whl", hash = "sha256:ef1f8afb832556fad5f90e7c46373edf9011a436df0d676e8450e05264c3ac0f"},
-    {file = "boto3-1.24.72.tar.gz", hash = "sha256:2e502227bfb67fe83b6d61ef9dacd49297bcb631d005cf27b5e54f65064c6e6d"},
+    {file = "boto3-1.26.0-py3-none-any.whl", hash = "sha256:0a19d07a39d69b8e84e24d75474bbf4e737b1749d0c665503dfc2446f321e1f0"},
+    {file = "boto3-1.26.0.tar.gz", hash = "sha256:8f0e4eb5c26f927c09bc03302d38156af578b816f1e4f8ca4f0f734d134b9d4f"},
 ]
 botocore = [
-    {file = "botocore-1.27.72-py3-none-any.whl", hash = "sha256:e29a777d261360dcb9283dfd460dc5feca3a46b7774e0c79be406d1a85673789"},
-    {file = "botocore-1.27.72.tar.gz", hash = "sha256:6184ab43a59118541b88e0ede24ccd671553323ace95bb7c8de3082a5cc581cb"},
+    {file = "botocore-1.29.0-py3-none-any.whl", hash = "sha256:c706640f8cf9297d2af87fc711394631afc14aaa225c7554e220964b5047b47d"},
+    {file = "botocore-1.29.0.tar.gz", hash = "sha256:f25dc0827005f81abf4b890a20c71f64ee40ea9e9795df38a242fdeed79e0a89"},
 ]
 cachetools = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
