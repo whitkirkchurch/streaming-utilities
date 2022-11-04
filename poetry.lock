@@ -274,18 +274,18 @@ six = "*"
 
 [[package]]
 name = "google-auth-oauthlib"
-version = "0.5.3"
+version = "0.7.1"
 description = "Google Authentication Library"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "google-auth-oauthlib-0.5.3.tar.gz", hash = "sha256:307d21918d61a0741882ad1fd001c67e68ad81206451d05fc4d26f79de56fc90"},
-    {file = "google_auth_oauthlib-0.5.3-py2.py3-none-any.whl", hash = "sha256:9e8ff4ed2b21c174a2d6cc2172c698dbf0b1f686509774c663a83c495091fe09"},
+    {file = "google-auth-oauthlib-0.7.1.tar.gz", hash = "sha256:9940f543f77d1447432a93781d7c931fb53e418023351ad4bf9e92837a1154ec"},
+    {file = "google_auth_oauthlib-0.7.1-py2.py3-none-any.whl", hash = "sha256:860e54c4b58b2664116c9cb44325bc0ec92bcd93e8211698ceea911b1b873b86"},
 ]
 
 [package.dependencies]
-google-auth = ">=1.0.0"
+google-auth = ">=2.14.0"
 requests-oauthlib = ">=0.7.0"
 
 [package.extras]
@@ -690,4 +690,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.5"
-content-hash = "1c572efeb4c4c8be5a44683a93fa60835dd23419f31ab76e21ba827a1760de83"
+content-hash = "362b9b0a0ff63a45044c0295c1438906e77c03f1b9c322bcb6aa510ac3467509"
