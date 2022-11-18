@@ -1,13 +1,13 @@
 [[package]]
 name = "boto3"
-version = "1.24.72"
+version = "1.26.12"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.72,<1.28.0"
+botocore = ">=1.29.12,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -16,7 +16,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.72"
+version = "1.29.12"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -444,16 +444,16 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.5"
-content-hash = "efe57d0e7d37297aac0100cd8d08c39bace512ef851cc490e5e8271f5f88bdc4"
+content-hash = "3afc56e1528ca6eb226f5400f99096a25af3789203e544a6885ea13b14b2941d"
 
 [metadata.files]
 boto3 = [
-    {file = "boto3-1.24.72-py3-none-any.whl", hash = "sha256:ef1f8afb832556fad5f90e7c46373edf9011a436df0d676e8450e05264c3ac0f"},
-    {file = "boto3-1.24.72.tar.gz", hash = "sha256:2e502227bfb67fe83b6d61ef9dacd49297bcb631d005cf27b5e54f65064c6e6d"},
+    {file = "boto3-1.26.12-py3-none-any.whl", hash = "sha256:180b4413db1211836c622adfc16dd40a7b99b86cac894bc6e17ddea9d282ab14"},
+    {file = "boto3-1.26.12.tar.gz", hash = "sha256:73da24667fe1351cef0f402ee9cd4589a0a9d97b617caca3c25b5cdc38f9d62c"},
 ]
 botocore = [
-    {file = "botocore-1.27.72-py3-none-any.whl", hash = "sha256:e29a777d261360dcb9283dfd460dc5feca3a46b7774e0c79be406d1a85673789"},
-    {file = "botocore-1.27.72.tar.gz", hash = "sha256:6184ab43a59118541b88e0ede24ccd671553323ace95bb7c8de3082a5cc581cb"},
+    {file = "botocore-1.29.12-py3-none-any.whl", hash = "sha256:3149b102e3c26c935acef6c330d0f46c717820d118886e983b6e81c306f31405"},
+    {file = "botocore-1.29.12.tar.gz", hash = "sha256:fdae73306a41a30697be300bdecb1e0d560d453c6d748891856beb87e9f6573f"},
 ]
 cachetools = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
