@@ -607,11 +607,8 @@ def sync_with_wordpress(update):
 
                 click.echo("Featured image known!")
 
-                # If this is a service-specific image, it might have changed. Compare!
-                if (
-                    service_object.churchsuite_image_field
-                    and service_object.wordpress_image_last_uploaded_name
-                ):
+                # Is this a service-specific image?
+                if service_object.churchsuite_image_field:
 
                     click.echo("Featured image is service-specific")
 
@@ -626,6 +623,7 @@ def sync_with_wordpress(update):
 
                     if last_uploaded_file == image_filename_from_airtable:
                         # This is the same image idenfitier, so just poke the metadata
+                        click.echo("WP and CS identifiers for image match")
                         if update:
                             requests.post(
                                 media_url + "/{}".format(featured_image_id),
