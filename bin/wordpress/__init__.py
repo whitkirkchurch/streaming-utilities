@@ -70,9 +70,12 @@ def create_or_update_oos_entry(
         "excerpt": service_object.description,
     }
 
-    if service_object.youtube_id:
-        resource_body["acf"]["youtube"] = service_object.youtube_id
-        resource_body["acf"]["streamed"] = True
+    if service_object.is_streaming:
+        if service_object.youtube_id:
+            resource_body["acf"]["youtube"] = service_object.youtube_id
+            resource_body["acf"]["streamed"] = True
+    else:
+        resource_body["acf"]["streamed"] = False
 
     if service_object.wordpress_image_id:
         featured_image_id = service_object.wordpress_image_id
