@@ -643,11 +643,13 @@ def sync_with_wordpress(update):
                         click.echo("Image has changed, replacing")
 
                         fileName = os.path.basename(service_image)
-                        media_resource_body["file"] = (
-                            fileName,
-                            open(service_image, "rb"),
-                            "image/jpg",
-                        )
+
+                        with open(service_image, "rb") as service_image_file:
+                            media_resource_body["file"] = (
+                                fileName,
+                                service_image_file,
+                                "image/jpg",
+                            )
 
                         multipart_data = MultipartEncoder(media_resource_body)
 
@@ -700,11 +702,13 @@ def sync_with_wordpress(update):
                 click.echo("No featured image ID known, uploading!")
 
                 fileName = os.path.basename(service_image)
-                media_resource_body["file"] = (
-                    fileName,
-                    open(service_image, "rb"),
-                    "image/jpg",
-                )
+
+                with open(service_image, "rb") as service_image_file:
+                    media_resource_body["file"] = (
+                        fileName,
+                        service_image_file,
+                        "image/jpg",
+                    )
 
                 media_resource_body["slug"] = service_object.churchsuite_image_field[0][
                     "filename"
