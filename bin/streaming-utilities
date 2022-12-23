@@ -18,7 +18,6 @@ sys.excepthook = rollbar_except_hook
 
 import requests
 import urllib.request
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import botocore
 import boto3
