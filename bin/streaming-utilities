@@ -841,7 +841,11 @@ def get_upcoming_streaming_services(services_table):
     )
 
     return services_table.all(
-        formula="AND({Date & time} >= TODAY(),{Streaming?} = 'Yes')",
+        formula="AND({"
+        + AIRTABLE_MAP["datetime"]
+        + "} >= TODAY(),{"
+        + AIRTABLE_MAP["streaming"]
+        + "} = 'Yes')",
         sort=["Date & time"],
     )
 
