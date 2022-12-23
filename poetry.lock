@@ -59,7 +59,7 @@ unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "churchsuite"
-version = "0.1.0"
+version = "0.1.4"
 description = "A Python package for consuming the ChurchSuite API"
 category = "main"
 optional = false
