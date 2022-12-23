@@ -141,33 +141,33 @@ def create_or_update_oos_entry(
                         "image/jpg",
                     )
 
-                multipart_data = MultipartEncoder(media_resource_body)
+                    multipart_data = MultipartEncoder(media_resource_body)
 
-                if update:
-                    requests.delete(
-                        media_url + "/{}".format(featured_image_id),
-                        headers=auth_header(),
-                    )
-                    response = requests.post(
-                        media_url,
-                        data=multipart_data,
-                        headers={"Content-Type": multipart_data.content_type},
-                        auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
-                    ).json()
-                    services_table.update(
-                        service_object.id,
-                        {
-                            AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
-                            AIRTABLE_MAP[
-                                "wp_image_last_uploaded_name"
-                            ]: image_filename_from_airtable,
-                        },
-                    )
-                    resource_body["featured_media"] = response["id"]
-                else:
-                    click.echo(
-                        click.style("In preview mode, skipping upload", fg="yellow")
-                    )
+                    if update:
+                        requests.delete(
+                            media_url + "/{}".format(featured_image_id),
+                            headers=auth_header(),
+                        )
+                        response = requests.post(
+                            media_url,
+                            data=multipart_data,
+                            headers={"Content-Type": multipart_data.content_type},
+                            auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
+                        ).json()
+                        services_table.update(
+                            service_object.id,
+                            {
+                                AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
+                                AIRTABLE_MAP[
+                                    "wp_image_last_uploaded_name"
+                                ]: image_filename_from_airtable,
+                            },
+                        )
+                        resource_body["featured_media"] = response["id"]
+                    else:
+                        click.echo(
+                            click.style("In preview mode, skipping upload", fg="yellow")
+                        )
 
         else:
 
@@ -198,29 +198,29 @@ def create_or_update_oos_entry(
                 "image/jpg",
             )
 
-        media_resource_body["slug"] = service_object.churchsuite_image_field[0][
-            "filename"
-        ].split(".")[0]
+            media_resource_body["slug"] = service_object.churchsuite_image_field[0][
+                "filename"
+            ].split(".")[0]
 
-        multipart_data = MultipartEncoder(media_resource_body)
+            multipart_data = MultipartEncoder(media_resource_body)
 
-        if update:
-            response = requests.post(
-                media_url,
-                data=multipart_data,
-                headers={"Content-Type": multipart_data.content_type},
-                auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
-            ).json()
-            services_table.update(
-                service_object.id,
-                {
-                    AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
-                    AIRTABLE_MAP["wp_image_last_uploaded_name"]: fileName,
-                },
-            )
-            resource_body["featured_media"] = response["id"]
-        else:
-            click.echo(click.style("In preview mode, skipping upload", fg="yellow"))
+            if update:
+                response = requests.post(
+                    media_url,
+                    data=multipart_data,
+                    headers={"Content-Type": multipart_data.content_type},
+                    auth=(WORDPRESS_USER, WORDPRESS_APPLICATION_PASSWORD),
+                ).json()
+                services_table.update(
+                    service_object.id,
+                    {
+                        AIRTABLE_MAP["wp_image_id"]: str(response["id"]),
+                        AIRTABLE_MAP["wp_image_last_uploaded_name"]: fileName,
+                    },
+                )
+                resource_body["featured_media"] = response["id"]
+            else:
+                click.echo(click.style("In preview mode, skipping upload", fg="yellow"))
 
     if service_object.order_of_service_id:
 
