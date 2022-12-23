@@ -507,9 +507,29 @@ def sync_with_wordpress(update):
         AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
     )
 
-    services_to_stream = get_upcoming_streaming_services(services_table)
+    click.echo(click.style("Syncing orders of service…", fg="blue"))
+
+    services_with_oos = get_upcoming_services_with_oos(services_table)
 
     previous_service = None
+
+    for service in services_with_oos:
+
+        service_object = Service(service)
+
+        click.echo(service_object.title_string)
+
+        wordpress.create_or_update_oos_entry(
+            service_object, previous_service, services_table, update
+        )
+
+        previous_service = service_object
+
+    click.echo(click.style("Done!", fg="green"))
+
+    click.echo(click.style("Syncing podcasts…", fg="blue"))
+
+    services_to_stream = get_upcoming_streaming_services(services_table)
 
     for service in services_to_stream:
 
@@ -517,18 +537,7 @@ def sync_with_wordpress(update):
 
         click.echo(service_object.title_string)
 
-        # We only generate OOS for public streams with an order of service
-        if service_object.is_stream_public and service_object.has_oos:
-
-            wordpress.create_or_update_oos_entry(
-                service_object, previous_service, services_table, update
-            )
-
-            wordpress.create_or_update_podcast_entry(
-                service_object, services_table, update
-            )
-
-        previous_service = service_object
+        wordpress.create_or_update_podcast_entry(service_object, services_table, update)
 
     click.echo(click.style("Done!", fg="green"))
 
@@ -553,6 +562,22 @@ def get_upcoming_streaming_services(services_table):
         + "} >= TODAY(),{"
         + AIRTABLE_MAP["streaming"]
         + "} = 'Yes')",
+        sort=["Date & time"],
+    )
+
+
+def get_upcoming_services_with_oos(services_table):
+
+    click.echo(
+        click.style("Getting upcoming services with OOS from Airtable…", fg="blue")
+    )
+
+    return services_table.all(
+        formula="AND({"
+        + AIRTABLE_MAP["datetime"]
+        + "} >= TODAY(),{"
+        + AIRTABLE_MAP["has_oos"]
+        + "} = TRUE())",
         sort=["Date & time"],
     )
 
