@@ -1,0 +1,14 @@
+#!/bin/sh
+
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ -n "$1" ]; then
+  echo "==> Running requested tests…"
+  python -m pytest "$1"
+else
+  echo "==> Running all tests…"
+  coverage run -m pytest
+fi

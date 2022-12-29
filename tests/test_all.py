@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-
 import unittest
 from unittest.mock import patch
 
+import os
+import sys
+
 from datetime import datetime
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), "bin"))
 
 from service import AIRTABLE_MAP, Service
 from youtube import Playlist, PlaylistManager
