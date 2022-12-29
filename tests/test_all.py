@@ -10,7 +10,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), "bin"))
 
 from services import AIRTABLE_MAP, Service
-from youtube import Playlist, PlaylistManager
+from interfaces.youtube import Playlist, PlaylistManager
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
@@ -493,7 +493,7 @@ class testService(unittest.TestCase):
 
 
 class testYoutubePlaylist(unittest.TestCase):
-    @patch("youtube.Api")
+    @patch("interfaces.youtube.Api")
     def test_load_items(self, api):
 
         api.client.playlistItems().list().execute.return_value = {
@@ -522,7 +522,7 @@ class testYoutubePlaylist(unittest.TestCase):
 
         self.assertEqual(playlist.videos_in_list, ["OnE", "tWo", "ThReE"])
 
-    @patch("youtube.Api")
+    @patch("interfaces.youtube.Api")
     def test_load_items_over_multiple_pages(self, api):
 
         api.client.playlistItems().list().execute.side_effect = [
@@ -570,7 +570,7 @@ class testYoutubePlaylist(unittest.TestCase):
             playlist.videos_in_list, ["OnE", "tWo", "ThReE", "fOuR", "fIvE"]
         )
 
-    @patch("youtube.Api")
+    @patch("interfaces.youtube.Api")
     def test_items(self, api):
 
         playlist = Playlist(api, "PlAyLiSt")
@@ -581,14 +581,14 @@ class testYoutubePlaylist(unittest.TestCase):
 
 
 class testYoutubePlaylistManager(unittest.TestCase):
-    @patch("youtube.Api")
+    @patch("interfaces.youtube.Api")
     def test_returns_playlist(self, *args):
 
         manager = PlaylistManager()
 
         self.assertIsInstance(manager.get("PlAyLiSt"), Playlist)
 
-    @patch("youtube.Api")
+    @patch("interfaces.youtube.Api")
     def test_returns_existing_instance_for_list_where_present(self, *args):
 
         manager = PlaylistManager()

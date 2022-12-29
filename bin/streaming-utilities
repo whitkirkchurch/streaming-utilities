@@ -41,8 +41,8 @@ import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
 from services import Service, AIRTABLE_MAP
-from youtube import PlaylistManager
-import wordpress
+from interfaces.youtube import PlaylistManager
+from interfaces import wordpress
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
