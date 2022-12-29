@@ -133,3 +133,11 @@ class PlaylistManager:
             self.playlists[playlist_id] = Playlist(self.youtube, playlist_id)
 
         return self.playlists[playlist_id]
+
+
+def video_in_playlist(video_id, playlist_id):
+    playlist = PlaylistManager().get(playlist_id)
+
+    click.echo(click.style(f"Checking if {video_id} in {playlist_id}", fg="blue"))
+
+    return video_id in playlist.items
