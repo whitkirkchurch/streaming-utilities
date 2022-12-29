@@ -7,7 +7,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import click
 
-from service import AIRTABLE_MAP
+from services import AIRTABLE_MAP
 
 WORDPRESS_BASE_URL = "https://whitkirkchurch.org.uk"
 WORDPRESS_USER = os.environ["WORDPRESS_USER"]

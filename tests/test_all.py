@@ -9,7 +9,7 @@ from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), "bin"))
 
-from service import AIRTABLE_MAP, Service
+from services import AIRTABLE_MAP, Service
 from youtube import Playlist, PlaylistManager
 
 
@@ -354,7 +354,7 @@ class testService(unittest.TestCase):
         )
 
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {"456": {"default_thumbnail": "test.jpg"}},
     )
     def test_has_category_behaviour_overrides(self):
@@ -370,7 +370,7 @@ class testService(unittest.TestCase):
         self.assertTrue(service_with_override.has_category_behaviour_overrides)
 
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {"456": {"default_thumbnail": "test.jpg"}},
     )
     def test_category_behaviour_overrides(self):
@@ -388,7 +388,7 @@ class testService(unittest.TestCase):
             {"default_thumbnail": "test.jpg"},
         )
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     def test_youtube_playlists_for_service_with_no_overrides(self):
 
         service = serviceFactory({})
@@ -396,9 +396,9 @@ class testService(unittest.TestCase):
         self.assertEqual(len(service.youtube_playlists_for_service), 1)
         self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {"123": {"youtube_playlists": {"ExTrApLaYlIsT"}}},
     )
     def test_youtube_playlists_for_service_with_additional_category(self):
@@ -409,9 +409,9 @@ class testService(unittest.TestCase):
         self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
         self.assertIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {
             "123": {
                 "exclude_youtube_playlists": {"PlAyLiStId"},
@@ -425,9 +425,9 @@ class testService(unittest.TestCase):
         self.assertEqual(len(service.youtube_playlists_for_service), 0)
         self.assertNotIn("PlAyLiStId", service.youtube_playlists_for_service)
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {
             "123": {
                 "youtube_playlists": {"ExTrApLaYlIsT"},
@@ -443,9 +443,9 @@ class testService(unittest.TestCase):
         self.assertNotIn("PlAyLiStId", service.youtube_playlists_for_service)
         self.assertIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {
             "123": {
                 "youtube_playlists": {"ExTrApLaYlIsT"},
@@ -459,9 +459,9 @@ class testService(unittest.TestCase):
 
         self.assertNotIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
 
-    @patch("service.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
+    @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     @patch(
-        "service.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {"123": {"youtube_playlists": {"PlAyLiStId"}}},
     )
     def test_youtube_playlists_for_service_deduplicates(self):
