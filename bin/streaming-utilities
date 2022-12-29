@@ -71,8 +71,6 @@ GOOGLE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRET_FILE = "client_secret.json"
 GOOGLE_CREDENTIALS_FILE = "token.json"
 
-WORDPRESS_DEFAULT_FEATURED_IMAGE_ID = os.environ["WORDPRESS_DEFAULT_FEATURED_IMAGE_ID"]
-
 AWS_S3_BUCKET_NAME = os.environ["AWS_S3_BUCKET_NAME"]
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET = os.environ["AWS_SECRET"]
