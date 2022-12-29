@@ -16,6 +16,9 @@ def rollbar_except_hook(exc_type, exc_value, traceback):
 
 sys.excepthook = rollbar_except_hook
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 import requests
 import urllib.request
 
@@ -37,9 +40,9 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from service import Service, AIRTABLE_MAP
-from youtube import PlaylistManager
-import wordpress
+from services import Service, AIRTABLE_MAP
+from interfaces.youtube import video_in_playlist
+from interfaces import wordpress
 
 AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -71,8 +74,6 @@ GOOGLE_OAUTH_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRET_FILE = "client_secret.json"
 GOOGLE_CREDENTIALS_FILE = "token.json"
 
-WORDPRESS_DEFAULT_FEATURED_IMAGE_ID = os.environ["WORDPRESS_DEFAULT_FEATURED_IMAGE_ID"]
-
 AWS_S3_BUCKET_NAME = os.environ["AWS_S3_BUCKET_NAME"]
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET = os.environ["AWS_SECRET"]
@@ -83,8 +84,6 @@ s3 = boto3.resource(
     "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET
 )
 bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
-
-youtube_playlist_manager = PlaylistManager()
 
 
 @click.group(chain=True)
@@ -539,14 +538,6 @@ def sync_with_wordpress(update):
         wordpress.create_or_update_podcast_entry(service_object, services_table, update)
 
     click.echo(click.style("Done!", fg="green"))
-
-
-def video_in_playlist(video_id, playlist_id):
-    playlist = youtube_playlist_manager.get(playlist_id)
-
-    click.echo(click.style(f"Checking if {video_id} in {playlist_id}", fg="blue"))
-
-    return video_id in playlist.items
 
 
 def get_upcoming_streaming_services(services_table):
