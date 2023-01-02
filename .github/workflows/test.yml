@@ -22,6 +22,7 @@ jobs:
       - name: Run tests
         run: poetry run script/test
         env:
+          AIRTABLE_API_KEY: keyTeStKeY
           AIRTABLE_BASE_ID: baseTeStBaSe
           AIRTABLE_SERVICES_TABLE_ID: tableTeStSeRvIcEs
           AWS_S3_BUCKET_NAME: test-bucket

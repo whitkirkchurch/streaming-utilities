@@ -31,7 +31,7 @@ import churchsuite
 import datetime
 import pytz
 
-from pyairtable import Table, utils
+from pyairtable import utils
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import google.oauth2.credentials
@@ -40,13 +40,9 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from services import Service, AIRTABLE_MAP
+import services
 from interfaces.youtube import video_in_playlist
-from interfaces import wordpress
-
-AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
-AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
-AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
+from interfaces import wordpress, airtable
 
 CHURCHSUITE_ACCOUNT = os.environ["CHURCHSUITE_ACCOUNT"]
 
@@ -120,8 +116,6 @@ def import_from_churchsuite():
         if event.object["images"]:
             events_to_sync[event_id]["image_url"] = event.object["images"]["lg"]["url"]
 
-    table = Table(AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID)
-
     click.echo(click.style("Comparing and synchronising…", fg="blue"))
 
     for event_sync_identifier, event in events_to_sync.items():
@@ -132,30 +126,30 @@ def import_from_churchsuite():
             )
         )
 
-        existing_event = table.first(
+        existing_event = airtable.services_table().first(
             formula="{ChurchSuite ID} = '" + event_sync_identifier + "'"
         )
 
         event_data_blob = {
-            AIRTABLE_MAP["name"]: event["name"],
-            AIRTABLE_MAP["datetime"]: event["datetime"].isoformat(),
-            AIRTABLE_MAP["type"]: event["category"],
-            AIRTABLE_MAP["churchsuite_id"]: str(event["id"]),
-            AIRTABLE_MAP["churchsuite_public_identifier"]: event["identifier"],
-            AIRTABLE_MAP["churchsuite_category_id"]: str(event["category_id"]),
+            services.AIRTABLE_MAP["name"]: event["name"],
+            services.AIRTABLE_MAP["datetime"]: event["datetime"].isoformat(),
+            services.AIRTABLE_MAP["type"]: event["category"],
+            services.AIRTABLE_MAP["churchsuite_id"]: str(event["id"]),
+            services.AIRTABLE_MAP["churchsuite_public_identifier"]: event["identifier"],
+            services.AIRTABLE_MAP["churchsuite_category_id"]: str(event["category_id"]),
         }
 
         if "image_url" in event:
-            event_data_blob[AIRTABLE_MAP["churchsuite_image"]] = [
+            event_data_blob[services.AIRTABLE_MAP["churchsuite_image"]] = [
                 utils.attachment(event["image_url"])
             ]
 
         if existing_event:
             click.echo(click.style("Match found, updating"))
-            table.update(existing_event["id"], event_data_blob)
+            airtable.services_table().update(existing_event["id"], event_data_blob)
         else:
             click.echo(click.style("Not found, creating a new record!"))
-            table.create(event_data_blob)
+            airtable.services_table().create(event_data_blob)
 
     click.echo(click.style("Done!", fg="green"))
 
@@ -167,20 +161,6 @@ def send_report(send_email):
     click.echo(click.style("Sending email report", fg="blue"))
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
-
-    services_table = Table(
-        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
-    )
-
-    services_to_stream = services_table.all(
-        formula="AND({Date & time} >= TODAY(),{Streaming?} = 'Yes')",
-        sort=["Date & time"],
-    )
-
-    services_undecided = services_table.all(
-        formula="AND({Date & time} >= TODAY(),{Streaming?} = '')",
-        sort=["Date & time"],
-    )
 
     click.echo(click.style("Preparing email content…", fg="blue"))
 
@@ -195,17 +175,14 @@ def send_report(send_email):
 
     next_week = datetime.datetime.today().astimezone() + datetime.timedelta(weeks=1)
 
-    for service in services_to_stream:
-
-        service_object = Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         if service_object.datetime >= next_week:
             email_variables["services_later"].append(service_object.service_data)
         else:
             email_variables["services_this_week"].append(service_object.service_data)
 
-    for service in services_undecided:
-        service_object = Service(service)
+    for service_object in services.upcoming_services_with_undecided_stream_status():
         email_variables["services_undecided"].append(service_object.service_data)
 
     click.echo(click.style("Building template…", fg="blue"))
@@ -247,12 +224,6 @@ def send_report(send_email):
 def sync_with_youtube(update):
 
     click.echo(click.style("Synchronising with YouTube", fg="blue"))
-
-    services_table = Table(
-        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
-    )
-
-    services_to_stream = get_upcoming_streaming_services(services_table)
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -297,9 +268,7 @@ def sync_with_youtube(update):
         api_service_name, api_version, credentials=creds
     )
 
-    for service in services_to_stream:
-
-        service_object = Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string_with_date)
 
@@ -380,8 +349,9 @@ def sync_with_youtube(update):
 
             if update:
                 response = request.execute()
-                services_table.update(
-                    service_object.id, {AIRTABLE_MAP["youtube_id"]: response["id"]}
+                airtable.services_table().update(
+                    service_object.id,
+                    {services.AIRTABLE_MAP["youtube_id"]: response["id"]},
                 )
 
                 # Bind the liveBroadcast to our standard stream ID
@@ -438,10 +408,10 @@ def sync_with_youtube(update):
                             media_body=MediaFileUpload(service_image),
                         )
                         thumb_request.execute()
-                        services_table.update(
+                        airtable.services_table().update(
                             service_object.id,
                             {
-                                AIRTABLE_MAP[
+                                services.AIRTABLE_MAP[
                                     "youtube_image_last_uploaded_name"
                                 ]: service_image,
                             },
@@ -501,24 +471,16 @@ def sync_with_wordpress(update):
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
 
-    services_table = Table(
-        AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_SERVICES_TABLE_ID
-    )
-
     click.echo(click.style("Syncing orders of service…", fg="blue"))
-
-    services_with_oos = get_upcoming_services_with_oos(services_table)
 
     previous_service = None
 
-    for service in services_with_oos:
-
-        service_object = Service(service)
+    for service_object in services.upcoming_services_with_oos():
 
         click.echo(service_object.title_string)
 
         wordpress.create_or_update_oos_entry(
-            service_object, previous_service, services_table, update
+            service_object, previous_service, airtable.services_table(), update
         )
 
         previous_service = service_object
@@ -527,49 +489,15 @@ def sync_with_wordpress(update):
 
     click.echo(click.style("Syncing podcasts…", fg="blue"))
 
-    services_to_stream = get_upcoming_streaming_services(services_table)
-
-    for service in services_to_stream:
-
-        service_object = Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string)
 
-        wordpress.create_or_update_podcast_entry(service_object, services_table, update)
+        wordpress.create_or_update_podcast_entry(
+            service_object, airtable.services_table(), update
+        )
 
     click.echo(click.style("Done!", fg="green"))
-
-
-def get_upcoming_streaming_services(services_table):
-
-    click.echo(
-        click.style("Getting upcoming streaming services from Airtable…", fg="blue")
-    )
-
-    return services_table.all(
-        formula="AND({"
-        + AIRTABLE_MAP["datetime"]
-        + "} >= TODAY(),{"
-        + AIRTABLE_MAP["streaming"]
-        + "} = 'Yes')",
-        sort=["Date & time"],
-    )
-
-
-def get_upcoming_services_with_oos(services_table):
-
-    click.echo(
-        click.style("Getting upcoming services with OOS from Airtable…", fg="blue")
-    )
-
-    return services_table.all(
-        formula="AND({"
-        + AIRTABLE_MAP["datetime"]
-        + "} >= TODAY(),{"
-        + AIRTABLE_MAP["has_oos"]
-        + "} = TRUE())",
-        sort=["Date & time"],
-    )
 
 
 if __name__ == "__main__":
