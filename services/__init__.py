@@ -3,6 +3,7 @@ import re
 import datetime
 import pytz
 
+from interfaces import airtable
 from pyairtable import utils
 
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
@@ -60,6 +61,41 @@ CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
 
 TZ_GMT = pytz.timezone("Etc/GMT")
 TZ_LONDON = pytz.timezone("Europe/London")
+
+
+def upcoming_streaming_services():
+
+    return airtable.services_table().all(
+        formula="AND({"
+        + AIRTABLE_MAP["datetime"]
+        + "} >= TODAY(),{"
+        + AIRTABLE_MAP["streaming"]
+        + "} = 'Yes')",
+        sort=[AIRTABLE_MAP["datetime"]],
+    )
+
+
+def upcoming_services_with_oos():
+
+    return airtable.services_table().all(
+        formula="AND({"
+        + AIRTABLE_MAP["datetime"]
+        + "} >= TODAY(),{"
+        + AIRTABLE_MAP["has_oos"]
+        + "} = TRUE())",
+        sort=[AIRTABLE_MAP["datetime"]],
+    )
+
+
+def upcoming_services_with_undecided_stream_status():
+    return airtable.services_table().all(
+        formula="AND({"
+        + AIRTABLE_MAP["datetime"]
+        + "} >= TODAY(),{"
+        + AIRTABLE_MAP["streaming"]
+        + "} = '')",
+        sort=[AIRTABLE_MAP["datetime"]],
+    )
 
 
 class Service:
