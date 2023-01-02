@@ -65,37 +65,46 @@ TZ_LONDON = pytz.timezone("Europe/London")
 
 def upcoming_streaming_services():
 
-    return airtable.services_table().all(
-        formula="AND({"
-        + AIRTABLE_MAP["datetime"]
-        + "} >= TODAY(),{"
-        + AIRTABLE_MAP["streaming"]
-        + "} = 'Yes')",
-        sort=[AIRTABLE_MAP["datetime"]],
-    )
+    return [
+        Service(service)
+        for service in airtable.services_table().all(
+            formula="AND({"
+            + AIRTABLE_MAP["datetime"]
+            + "} >= TODAY(),{"
+            + AIRTABLE_MAP["streaming"]
+            + "} = 'Yes')",
+            sort=[AIRTABLE_MAP["datetime"]],
+        )
+    ]
 
 
 def upcoming_services_with_oos():
 
-    return airtable.services_table().all(
-        formula="AND({"
-        + AIRTABLE_MAP["datetime"]
-        + "} >= TODAY(),{"
-        + AIRTABLE_MAP["has_oos"]
-        + "} = TRUE())",
-        sort=[AIRTABLE_MAP["datetime"]],
-    )
+    return [
+        Service(service)
+        for service in airtable.services_table().all(
+            formula="AND({"
+            + AIRTABLE_MAP["datetime"]
+            + "} >= TODAY(),{"
+            + AIRTABLE_MAP["has_oos"]
+            + "} = TRUE())",
+            sort=[AIRTABLE_MAP["datetime"]],
+        )
+    ]
 
 
 def upcoming_services_with_undecided_stream_status():
-    return airtable.services_table().all(
-        formula="AND({"
-        + AIRTABLE_MAP["datetime"]
-        + "} >= TODAY(),{"
-        + AIRTABLE_MAP["streaming"]
-        + "} = '')",
-        sort=[AIRTABLE_MAP["datetime"]],
-    )
+    return [
+        Service(service)
+        for service in airtable.services_table().all(
+            formula="AND({"
+            + AIRTABLE_MAP["datetime"]
+            + "} >= TODAY(),{"
+            + AIRTABLE_MAP["streaming"]
+            + "} = '')",
+            sort=[AIRTABLE_MAP["datetime"]],
+        )
+    ]
 
 
 class Service:

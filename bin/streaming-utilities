@@ -162,10 +162,6 @@ def send_report(send_email):
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
 
-    services_to_stream = services.upcoming_streaming_services()
-
-    services_undecided = services.upcoming_services_with_undecided_stream_status()
-
     click.echo(click.style("Preparing email content…", fg="blue"))
 
     now = datetime.datetime.now()
@@ -179,17 +175,14 @@ def send_report(send_email):
 
     next_week = datetime.datetime.today().astimezone() + datetime.timedelta(weeks=1)
 
-    for service in services_to_stream:
-
-        service_object = services.Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         if service_object.datetime >= next_week:
             email_variables["services_later"].append(service_object.service_data)
         else:
             email_variables["services_this_week"].append(service_object.service_data)
 
-    for service in services_undecided:
-        service_object = services.Service(service)
+    for service_object in services.upcoming_services_with_undecided_stream_status():
         email_variables["services_undecided"].append(service_object.service_data)
 
     click.echo(click.style("Building template…", fg="blue"))
@@ -231,8 +224,6 @@ def send_report(send_email):
 def sync_with_youtube(update):
 
     click.echo(click.style("Synchronising with YouTube", fg="blue"))
-
-    services_to_stream = services.upcoming_streaming_services()
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -277,9 +268,7 @@ def sync_with_youtube(update):
         api_service_name, api_version, credentials=creds
     )
 
-    for service in services_to_stream:
-
-        service_object = services.Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string_with_date)
 
@@ -484,13 +473,9 @@ def sync_with_wordpress(update):
 
     click.echo(click.style("Syncing orders of service…", fg="blue"))
 
-    services_with_oos = services.upcoming_services_with_oos()
-
     previous_service = None
 
-    for service in services_with_oos:
-
-        service_object = services.Service(service)
+    for service_object in services.upcoming_services_with_oos():
 
         click.echo(service_object.title_string)
 
@@ -504,11 +489,7 @@ def sync_with_wordpress(update):
 
     click.echo(click.style("Syncing podcasts…", fg="blue"))
 
-    services_to_stream = services.upcoming_streaming_services()
-
-    for service in services_to_stream:
-
-        service_object = services.Service(service)
+    for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string)
 
