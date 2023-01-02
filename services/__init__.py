@@ -6,6 +6,8 @@ import pytz
 from interfaces import airtable
 from pyairtable import utils
 
+import urllib.request
+
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
 AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]
 
@@ -34,6 +36,8 @@ AIRTABLE_MAP = {
 }
 
 YOUTUBE_DEFAULT_PLAYLIST_ID = "PLQl3S_pmB65sll8wZSQY-c5BXFzrygV1P"
+
+DEFAULT_SERVICE_IMAGE = "images/default_thumbnails/service.jpg"
 
 CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES = {
     "9": {
@@ -304,6 +308,39 @@ class Service:
             "fee_payable": self.is_fee_payable,
         }
 
+    @property
+    def has_service_specific_image(self):
+        return self.churchsuite_image_field
+
+    @property
+    def has_category_specific_image(self):
+        return (
+            self.has_category_behaviour_overrides
+            and "default_thumbnail" in self.category_behaviour_overrides
+        )
+
+    @property
+    def service_image(self):
+
+        # Service-specific image squashes category defaults
+        if self.has_service_specific_image:
+            image_data = self.churchsuite_image_field[0]
+            image_url = image_data["url"]
+            image_save_location, _ = download_service_image(
+                image_url, image_data["filename"]
+            )
+
+            return image_save_location
+
+        # Category defaults squash master default image
+        if self.has_category_specific_image:
+            return "images/default_thumbnails/{}".format(
+                self.category_behaviour_overrides["default_thumbnail"]
+            )
+
+        # Fall back to the default
+        return DEFAULT_SERVICE_IMAGE
+
     def datetime_to_publish_order_of_service_given_previous_service(
         self, previous_service=None
     ):
@@ -363,3 +400,8 @@ class Service:
             return "public"
         else:
             return "unlisted"
+
+
+def download_service_image(url, filename):
+    image_save_location = "images/service_specific/{}".format(filename)
+    return urllib.request.urlretrieve(url, image_save_location)

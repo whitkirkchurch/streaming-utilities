@@ -20,7 +20,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import requests
-import urllib.request
 
 import botocore
 import boto3
@@ -272,30 +271,7 @@ def sync_with_youtube(update):
 
         click.echo(service_object.title_string_with_date)
 
-        # Establish service defaults
-
-        service_image = "images/default_thumbnails/service.jpg"
-
-        # Apply category-specific overrides
-
-        if service_object.has_category_behaviour_overrides:
-            print("Overriding service defaults for category")
-
-            if "default_thumbnail" in service_object.category_behaviour_overrides:
-                service_image = "images/default_thumbnails/{}".format(
-                    service_object.category_behaviour_overrides["default_thumbnail"]
-                )
-
-        if service_object.churchsuite_image_field:
-            click.echo(click.style("Service-specific image found...", fg="blue"))
-            image_data = service_object.churchsuite_image_field[0]
-            image_url = image_data["url"]
-            image_save_location = "images/service_specific/{}".format(
-                image_data["filename"]
-            )
-            urllib.request.urlretrieve(image_url, image_save_location)
-
-            service_image = image_save_location
+        service_image = service_object.service_image
 
         # Actually build objects and perform updates
 
