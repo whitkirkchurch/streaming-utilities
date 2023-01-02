@@ -1,16 +1,14 @@
 import unittest
 from unittest.mock import patch
 
-import os
-import sys
-
 from datetime import datetime
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(os.path.dirname(SCRIPT_DIR), "bin"))
-
-from services import AIRTABLE_MAP, Service
-from interfaces.youtube import Playlist, PlaylistManager
+from services import (
+    AIRTABLE_MAP,
+    Service,
+    DEFAULT_SERVICE_IMAGE,
+    download_service_image,
+)
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
@@ -353,6 +351,86 @@ class testService(unittest.TestCase):
             "A sung Eucharist streamed live from Some Place for the eleventy-first Sunday after Trinity.",
         )
 
+    def test_has_service_specific_image(self):
+
+        service_with_specific_image = serviceFactory(
+            {
+                AIRTABLE_MAP["churchsuite_image"]: [
+                    {"url": "https://example.com/1m4g3.jpg", "filename": "1m4g3.jpg"}
+                ]
+            }
+        )
+
+        service_without_specific_image = serviceFactory({})
+
+        self.assertTrue(service_with_specific_image.has_service_specific_image)
+
+        self.assertFalse(service_without_specific_image.has_service_specific_image)
+
+    @patch(
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {"456": {"default_thumbnail": "override.jpg"}},
+    )
+    def test_has_category_specific_image(self):
+
+        service_without_override = serviceFactory(
+            {AIRTABLE_MAP["churchsuite_category_id"]: "123"}
+        )
+        service_with_override = serviceFactory(
+            {AIRTABLE_MAP["churchsuite_category_id"]: "456"}
+        )
+
+        self.assertFalse(service_without_override.has_category_specific_image)
+        self.assertTrue(service_with_override.has_category_specific_image)
+
+    @patch(
+        "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
+        {"456": {"default_thumbnail": "override.jpg"}},
+    )
+    @patch("services.download_service_image")
+    def test_has_category_specific_image(self, download_image):
+
+        service_with_specific_image_without_category = serviceFactory(
+            {
+                AIRTABLE_MAP["churchsuite_image"]: [
+                    {"url": "https://example.com/1m4g31.jpg", "filename": "1m4g31.jpg"}
+                ]
+            }
+        )
+        service_with_specific_image_with_category = serviceFactory(
+            {
+                AIRTABLE_MAP["churchsuite_image"]: [
+                    {"url": "https://example.com/1m4g32.jpg", "filename": "1m4g32.jpg"}
+                ],
+                AIRTABLE_MAP["churchsuite_category_id"]: "456",
+            }
+        )
+        service_with_category = serviceFactory(
+            {AIRTABLE_MAP["churchsuite_category_id"]: "456"}
+        )
+        service_without_override = serviceFactory(
+            {AIRTABLE_MAP["churchsuite_category_id"]: "123"}
+        )
+
+        download_image.side_effect = [
+            ("images/service_specific/1m4g31.jpg", []),
+            ("images/service_specific/1m4g32.jpg", []),
+        ]
+
+        self.assertEqual(
+            service_with_specific_image_without_category.service_image,
+            "images/service_specific/1m4g31.jpg",
+        )
+        self.assertEqual(
+            service_with_specific_image_with_category.service_image,
+            "images/service_specific/1m4g32.jpg",
+        )
+        self.assertEqual(
+            service_with_category.service_image,
+            "images/default_thumbnails/override.jpg",
+        )
+        self.assertEqual(service_without_override.service_image, DEFAULT_SERVICE_IMAGE)
+
     @patch(
         "services.CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES",
         {"456": {"default_thumbnail": "test.jpg"}},
@@ -492,112 +570,12 @@ class testService(unittest.TestCase):
         self.assertEqual(service_public_no.youtube_privacy, "unlisted")
 
 
-class testYoutubePlaylist(unittest.TestCase):
-    @patch("interfaces.youtube.Api")
-    def test_load_items(self, api):
+class testServiceFunctions(unittest.TestCase):
+    @patch("services.urllib.request.urlretrieve")
+    def test_download_service_image(self, urlretrieve):
 
-        api.client.playlistItems().list().execute.return_value = {
-            "items": [
-                {
-                    "snippet": {
-                        "resourceId": {"kind": "youtube#video", "videoId": "OnE"}
-                    }
-                },
-                {
-                    "snippet": {
-                        "resourceId": {"kind": "youtube#video", "videoId": "tWo"}
-                    }
-                },
-                {
-                    "snippet": {
-                        "resourceId": {"kind": "youtube#video", "videoId": "ThReE"}
-                    }
-                },
-            ]
-        }
+        download_service_image("https://example.com/test.jpg", "test.jpg")
 
-        playlist = Playlist(api, "PlAyLiSt")
-
-        api.client.playlistItems().list().execute.assert_called_once()
-
-        self.assertEqual(playlist.videos_in_list, ["OnE", "tWo", "ThReE"])
-
-    @patch("interfaces.youtube.Api")
-    def test_load_items_over_multiple_pages(self, api):
-
-        api.client.playlistItems().list().execute.side_effect = [
-            {
-                "items": [
-                    {
-                        "snippet": {
-                            "resourceId": {"kind": "youtube#video", "videoId": "OnE"}
-                        }
-                    },
-                    {
-                        "snippet": {
-                            "resourceId": {"kind": "youtube#video", "videoId": "tWo"}
-                        }
-                    },
-                    {
-                        "snippet": {
-                            "resourceId": {"kind": "youtube#video", "videoId": "ThReE"}
-                        }
-                    },
-                ],
-                "nextPageToken": "NeXtPaGe",
-            },
-            {
-                "items": [
-                    {
-                        "snippet": {
-                            "resourceId": {"kind": "youtube#video", "videoId": "fOuR"}
-                        }
-                    },
-                    {
-                        "snippet": {
-                            "resourceId": {"kind": "youtube#video", "videoId": "fIvE"}
-                        }
-                    },
-                ],
-            },
-        ]
-
-        playlist = Playlist(api, "PlAyLiSt")
-
-        self.assertEqual(api.client.playlistItems().list().execute.call_count, 2)
-
-        self.assertEqual(
-            playlist.videos_in_list, ["OnE", "tWo", "ThReE", "fOuR", "fIvE"]
+        urlretrieve.assert_called_with(
+            "https://example.com/test.jpg", "images/service_specific/test.jpg"
         )
-
-    @patch("interfaces.youtube.Api")
-    def test_items(self, api):
-
-        playlist = Playlist(api, "PlAyLiSt")
-
-        playlist.videos_in_list = ["OnE", "tWo", "ThReE"]
-
-        self.assertEqual(playlist.items, ["OnE", "tWo", "ThReE"])
-
-
-class testYoutubePlaylistManager(unittest.TestCase):
-    @patch("interfaces.youtube.Api")
-    def test_returns_playlist(self, *args):
-
-        manager = PlaylistManager()
-
-        self.assertIsInstance(manager.get("PlAyLiSt"), Playlist)
-
-    @patch("interfaces.youtube.Api")
-    def test_returns_existing_instance_for_list_where_present(self, *args):
-
-        manager = PlaylistManager()
-
-        playlist_1 = manager.get("PlAyLiSt")
-        playlist_2 = manager.get("PlAyLiSt")
-
-        self.assertEqual(id(playlist_1), id(playlist_2))
-
-
-if __name__ == "__main__":
-    unittest.main()
