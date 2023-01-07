@@ -13,3 +13,5 @@ token.json
 
 images/service_specific/*
 !images/service_specific/.gitkeep
+images/youtube_generated_thumbnails/*
+!images/youtube_generated_thumbnails/.gitkeep
