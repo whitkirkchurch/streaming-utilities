@@ -275,8 +275,6 @@ def sync_with_youtube(update):
     FONT_LATO_BOLD_LG = ImageFont.truetype("fonts/Lato-Bold.ttf", 56)
     FONT_LATO_REGULAR_MD = ImageFont.truetype("fonts/Lato-Regular.ttf", 42)
 
-    SM_SYMBOL_IMAGE = Image.open("images/sm_symbol.png")
-
     for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string_with_date)
@@ -384,6 +382,7 @@ def sync_with_youtube(update):
                 yt_thumb_data_hash_dict = {
                     "title": service_object.title_string,
                     "datetime": service_object.datetime.strftime("%-d %B %Y"),
+                    "version": 2,
                 }
 
                 yt_thumb_data_hash = hashlib.md5(
@@ -412,6 +411,9 @@ def sync_with_youtube(update):
 
                         sized_image = thumb_image.resize(target_image_dimensions)
 
+                        drawing_corner_offset_x = 30
+                        drawing_corner_offset_y = 90
+
                         # Create piece of canvas to draw text on and blur
                         blurred = Image.new("RGBA", sized_image.size)
                         draw = ImageDraw.Draw(blurred)
@@ -421,12 +423,12 @@ def sync_with_youtube(update):
                         aux_text = service_object.datetime.strftime("%-d %B %Y")
 
                         main_text_draw_coordinates = (
-                            130,
-                            target_image_dimensions[1] - 30,
+                            drawing_corner_offset_x,
+                            target_image_dimensions[1] - 10 - drawing_corner_offset_y,
                         )
                         aux_text_draw_coordinates = (
-                            130,
-                            target_image_dimensions[1] - 90,
+                            drawing_corner_offset_x,
+                            target_image_dimensions[1] - 70 - drawing_corner_offset_y,
                         )
 
                         draw.text(
@@ -463,12 +465,6 @@ def sync_with_youtube(update):
                             fill="#FFF",
                             font=FONT_LATO_REGULAR_MD,
                             anchor="ls",
-                        )
-
-                        sized_image.paste(
-                            SM_SYMBOL_IMAGE,
-                            (20, target_image_dimensions[1] - 125),
-                            SM_SYMBOL_IMAGE,
                         )
 
                         sized_image.save(
