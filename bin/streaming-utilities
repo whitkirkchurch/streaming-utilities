@@ -21,9 +21,6 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import requests
 
-import hashlib
-import json
-
 import botocore
 import boto3
 import click
@@ -42,11 +39,10 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from googleapiclient.http import MediaFileUpload
 
-from PIL import Image, ImageFont, ImageDraw, ImageFilter
-
 import services
 from interfaces.youtube import video_in_playlist
 from interfaces import wordpress, airtable
+from generators.youtube_thumbnails import YoutubeThumbnail
 
 CHURCHSUITE_ACCOUNT = os.environ["CHURCHSUITE_ACCOUNT"]
 
@@ -272,14 +268,9 @@ def sync_with_youtube(update):
         api_service_name, api_version, credentials=creds
     )
 
-    FONT_LATO_BOLD_LG = ImageFont.truetype("fonts/Lato-Bold.ttf", 56)
-    FONT_LATO_REGULAR_MD = ImageFont.truetype("fonts/Lato-Regular.ttf", 42)
-
     for service_object in services.upcoming_streaming_services():
 
         click.echo(service_object.title_string_with_date)
-
-        service_image = service_object.service_image
 
         # Actually build objects and perform updates
 
@@ -375,124 +366,42 @@ def sync_with_youtube(update):
                     )
                 )
 
-            if service_image:
+            if service_object.service_image:
 
-                # Get the resource metadata, so we can compare the filename
+                service_thumbnail = YoutubeThumbnail(service_object)
 
-                yt_thumb_data_hash_dict = {
-                    "title": service_object.title_string,
-                    "datetime": service_object.datetime.strftime("%-d %B %Y"),
-                    "version": 2,
-                }
-
-                yt_thumb_data_hash = hashlib.md5(
-                    json.dumps(yt_thumb_data_hash_dict, sort_keys=True).encode("utf-8")
-                ).hexdigest()
-
-                service_image_with_hash = service_image + "_" + yt_thumb_data_hash
-
-                last_uploaded_file = service_object.youtube_image_last_uploaded_name
-
-                if last_uploaded_file != service_image_with_hash:
+                if (
+                    service_object.youtube_image_last_uploaded_name
+                    != service_thumbnail.generated_image_hash
+                ):
 
                     click.echo("Image has changed, replacing")
 
-                    with Image.open(service_image) as thumb_image:
+                    service_thumbnail.generate()
 
-                        generated_image_path = (
-                            "images/youtube_generated_thumbnails/{hash}.jpg".format(
-                                hash=yt_thumb_data_hash
+                    if update:
+                        click.echo("Updating YouTube thumbnail...")
+                        thumb_request = youtube.thumbnails().set(
+                            videoId=response["id"],
+                            media_body=MediaFileUpload(
+                                service_thumbnail.generated_image_path
+                            ),
+                        )
+                        thumb_request.execute()
+                        airtable.services_table().update(
+                            service_object.id,
+                            {
+                                services.AIRTABLE_MAP[
+                                    "youtube_image_last_uploaded_name"
+                                ]: service_thumbnail.generated_image_hash,
+                            },
+                        )
+                    else:
+                        click.echo(
+                            click.style(
+                                "In preview mode, skipping thumbnail", fg="yellow"
                             )
                         )
-
-                        target_image_dimensions = (1280, 720)
-
-                        thumb_image.thumbnail(target_image_dimensions)
-
-                        sized_image = thumb_image.resize(target_image_dimensions)
-
-                        drawing_corner_offset_x = 30
-                        drawing_corner_offset_y = 90
-
-                        # Create piece of canvas to draw text on and blur
-                        blurred = Image.new("RGBA", sized_image.size)
-                        draw = ImageDraw.Draw(blurred)
-
-                        # Text we want to actually write
-                        main_text = service_object.title_string
-                        aux_text = service_object.datetime.strftime("%-d %B %Y")
-
-                        main_text_draw_coordinates = (
-                            drawing_corner_offset_x,
-                            target_image_dimensions[1] - 10 - drawing_corner_offset_y,
-                        )
-                        aux_text_draw_coordinates = (
-                            drawing_corner_offset_x,
-                            target_image_dimensions[1] - 70 - drawing_corner_offset_y,
-                        )
-
-                        draw.text(
-                            xy=main_text_draw_coordinates,
-                            text=main_text,
-                            fill="#030303",
-                            font=FONT_LATO_BOLD_LG,
-                            anchor="ls",
-                        )
-                        draw.text(
-                            xy=aux_text_draw_coordinates,
-                            text=aux_text,
-                            fill="#030303",
-                            font=FONT_LATO_REGULAR_MD,
-                            anchor="ls",
-                        )
-                        blurred = blurred.filter(ImageFilter.BoxBlur(7))
-
-                        # Paste soft text onto background
-                        sized_image.paste(blurred, blurred)
-
-                        # Draw on sharp text
-                        draw = ImageDraw.Draw(sized_image)
-                        draw.text(
-                            xy=main_text_draw_coordinates,
-                            text=main_text,
-                            fill="#FFF",
-                            font=FONT_LATO_BOLD_LG,
-                            anchor="ls",
-                        )
-                        draw.text(
-                            xy=aux_text_draw_coordinates,
-                            text=aux_text,
-                            fill="#FFF",
-                            font=FONT_LATO_REGULAR_MD,
-                            anchor="ls",
-                        )
-
-                        sized_image.save(
-                            generated_image_path,
-                            format="JPEG",
-                        )
-
-                        if update:
-                            click.echo("Updating YouTube thumbnail...")
-                            thumb_request = youtube.thumbnails().set(
-                                videoId=response["id"],
-                                media_body=MediaFileUpload(generated_image_path),
-                            )
-                            thumb_request.execute()
-                            airtable.services_table().update(
-                                service_object.id,
-                                {
-                                    services.AIRTABLE_MAP[
-                                        "youtube_image_last_uploaded_name"
-                                    ]: service_image_with_hash,
-                                },
-                            )
-                        else:
-                            click.echo(
-                                click.style(
-                                    "In preview mode, skipping thumbnail", fg="yellow"
-                                )
-                            )
 
             # Now, add to playlists!
             for playlist in service_object.youtube_playlists_for_service:
