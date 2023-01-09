@@ -11,6 +11,7 @@ GENERATOR_VERSION = 3
 TARGET_THUMBNAIL_DIMENSIONS = (1280, 720)
 HORIZONTAL_MARGIN = 30
 BOTTOM_MARGIN = 90
+SPACING_BETWEEN_TEXT = 8
 
 
 class YoutubeThumbnail:
@@ -60,13 +61,23 @@ class YoutubeThumbnail:
             main_text = self.service.title_string
             aux_text = self.service.datetime.strftime("%-d %B %Y")
 
+            # Figure out the bounding boxes for our text
+            main_text_bounding = FONT_LATO_BOLD_LG.getbbox(main_text, anchor="ld")
+            main_text_height = -main_text_bounding[1]
+
+            print(main_text_bounding)
+
             main_text_draw_coordinates = (
                 HORIZONTAL_MARGIN,
                 TARGET_THUMBNAIL_DIMENSIONS[1] - 10 - BOTTOM_MARGIN,
             )
+
             aux_text_draw_coordinates = (
                 HORIZONTAL_MARGIN,
-                TARGET_THUMBNAIL_DIMENSIONS[1] - 70 - BOTTOM_MARGIN,
+                TARGET_THUMBNAIL_DIMENSIONS[1]
+                - main_text_height
+                - BOTTOM_MARGIN
+                - SPACING_BETWEEN_TEXT,
             )
 
             draw.text(
@@ -81,7 +92,7 @@ class YoutubeThumbnail:
                 text=aux_text,
                 fill="#030303",
                 font=FONT_LATO_REGULAR_MD,
-                anchor="ls",
+                anchor="ld",
             )
             blurred = blurred.filter(ImageFilter.BoxBlur(7))
 
@@ -102,7 +113,7 @@ class YoutubeThumbnail:
                 text=aux_text,
                 fill="#FFF",
                 font=FONT_LATO_REGULAR_MD,
-                anchor="ls",
+                anchor="ld",
             )
 
             sized_image.save(
