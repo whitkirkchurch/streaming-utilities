@@ -8,6 +8,10 @@ FONT_LATO_REGULAR_MD = ImageFont.truetype("fonts/Lato-Regular.ttf", 42)
 
 GENERATOR_VERSION = 3
 
+TARGET_THUMBNAIL_DIMENSIONS = (1280, 720)
+HORIZONTAL_MARGIN = 30
+BOTTOM_MARGIN = 90
+
 
 class YoutubeThumbnail:
     def __init__(self, service):
@@ -42,14 +46,11 @@ class YoutubeThumbnail:
 
         with Image.open(self.service_image_path) as thumb_image:
 
-            target_image_dimensions = (1280, 720)
+            # Thumbnail the image, which handles cropping and resizing down (but not up)
+            thumb_image.thumbnail(TARGET_THUMBNAIL_DIMENSIONS)
 
-            thumb_image.thumbnail(target_image_dimensions)
-
-            sized_image = thumb_image.resize(target_image_dimensions)
-
-            drawing_corner_offset_x = 30
-            drawing_corner_offset_y = 90
+            # Resize the image, which scales it back up if necessary
+            sized_image = thumb_image.resize(TARGET_THUMBNAIL_DIMENSIONS)
 
             # Create piece of canvas to draw text on and blur
             blurred = Image.new("RGBA", sized_image.size)
@@ -60,12 +61,12 @@ class YoutubeThumbnail:
             aux_text = self.service.datetime.strftime("%-d %B %Y")
 
             main_text_draw_coordinates = (
-                drawing_corner_offset_x,
-                target_image_dimensions[1] - 10 - drawing_corner_offset_y,
+                HORIZONTAL_MARGIN,
+                TARGET_THUMBNAIL_DIMENSIONS[1] - 10 - BOTTOM_MARGIN,
             )
             aux_text_draw_coordinates = (
-                drawing_corner_offset_x,
-                target_image_dimensions[1] - 70 - drawing_corner_offset_y,
+                HORIZONTAL_MARGIN,
+                TARGET_THUMBNAIL_DIMENSIONS[1] - 70 - BOTTOM_MARGIN,
             )
 
             draw.text(
