@@ -1,12 +1,12 @@
+import datetime
 import os
 import re
-import datetime
-import pytz
+import urllib.request
 
-from interfaces import airtable
+import pytz
 from pyairtable import utils
 
-import urllib.request
+from interfaces import airtable
 
 AIRTABLE_BASE_ID = os.environ["AIRTABLE_BASE_ID"]
 AIRTABLE_SERVICES_TABLE_ID = os.environ["AIRTABLE_SERVICES_TABLE_ID"]

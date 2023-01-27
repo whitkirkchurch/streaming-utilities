@@ -14,7 +14,7 @@ A collection of useful utilities which make the lives of our streaming team easi
         POD[Podcast stubs]
         YT[YouTube streams]
         E[Email reports]
-        
+
         CS --> |import-from-churchsuite| AT
         AT --> |sync-with-wordpress| OOS
         AT --> |sync-with-wordpress| POD

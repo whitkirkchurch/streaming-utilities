@@ -1,7 +1,7 @@
 import hashlib
 import json
 
-from PIL import Image, ImageFont, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 FONT_LATO_BOLD_LG = ImageFont.truetype("fonts/Lato-Bold.ttf", 56)
 FONT_LATO_REGULAR_MD = ImageFont.truetype("fonts/Lato-Regular.ttf", 42)
