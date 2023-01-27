@@ -22,6 +22,9 @@ pillow = "^9.4.0"
 [tool.poetry.dev-dependencies]
 coverage = "^7.0.5"
 
+[tool.isort]
+profile = "black"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
