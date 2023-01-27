@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import sys
+
 import rollbar
 
 ROLLBAR_ACCESS_TOKEN = os.environ["ROLLBAR_ACCESS_TOKEN"]
@@ -19,30 +20,26 @@ sys.excepthook = rollbar_except_hook
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-import requests
-
-import botocore
-import boto3
-import click
-
-import churchsuite
-
 import datetime
-import pytz
 
-from pyairtable import utils
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-
+import boto3
+import botocore
+import churchsuite
+import click
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
+import pytz
+import requests
 from googleapiclient.http import MediaFileUpload
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from pyairtable import utils
 
 import services
-from interfaces.youtube import video_in_playlist
-from interfaces import wordpress, airtable
 from generators.youtube_thumbnails import YoutubeThumbnail
+from interfaces import airtable, wordpress
+from interfaces.youtube import video_in_playlist
 
 CHURCHSUITE_ACCOUNT = os.environ["CHURCHSUITE_ACCOUNT"]
 

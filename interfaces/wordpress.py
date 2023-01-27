@@ -1,11 +1,10 @@
-import os
-
 import base64
-import requests
+import os
 import urllib.request
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import click
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from services import AIRTABLE_MAP
 

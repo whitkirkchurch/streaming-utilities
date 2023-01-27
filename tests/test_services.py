@@ -1,12 +1,11 @@
 import unittest
-from unittest.mock import patch
-
 from datetime import datetime
+from unittest.mock import patch
 
 from services import (
     AIRTABLE_MAP,
-    Service,
     DEFAULT_SERVICE_IMAGE,
+    Service,
     download_service_image,
 )
 

@@ -1,10 +1,8 @@
 import os
-
 from unittest.mock import patch
 
-from services import AIRTABLE_MAP, Service
-
 from generators.youtube_thumbnails import YoutubeThumbnail
+from services import AIRTABLE_MAP, Service
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
