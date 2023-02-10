@@ -21,18 +21,18 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 
 [[package]]
 name = "boto3"
-version = "1.26.58"
+version = "1.26.68"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.58-py3-none-any.whl", hash = "sha256:d130281211014510b2cf33412a177909d8d18286e1ef67362850dea07067b7df"},
-    {file = "boto3-1.26.58.tar.gz", hash = "sha256:89811efea5ac4eeba0a816a41e651fa06110926a7fdb7f20e5eb84e519902ee2"},
+    {file = "boto3-1.26.68-py3-none-any.whl", hash = "sha256:bbb426a9b3afd3ccbac25e03b215d79e90b4c47905b1b08b3b9d86fc74096974"},
+    {file = "boto3-1.26.68.tar.gz", hash = "sha256:c92dd0fde7839c0ca9c16a989d67ceb7f80f53de19f2b087fd1182f2af41b2ae"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.58,<1.30.0"
+botocore = ">=1.29.68,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -41,14 +41,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.58"
+version = "1.29.68"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.58-py3-none-any.whl", hash = "sha256:413ea124f2486f142dd59ed7fb68ec86f53bc7c932db9613cadd510d76c6b245"},
-    {file = "botocore-1.29.58.tar.gz", hash = "sha256:e4e0d05c1493bedc88bb78b24a08d79a60f3b9cea21a64edea3e8411823ecf82"},
+    {file = "botocore-1.29.68-py3-none-any.whl", hash = "sha256:08fa8302a22553e69b70b1de2cc8cec61a3a878546658d091473e13d5b9d2ca4"},
+    {file = "botocore-1.29.68.tar.gz", hash = "sha256:8f5cb96dc0862809d29fe512087c77c15fe6328a2d8238f0a96cccb6eb77ec12"},
 ]
 
 [package.dependencies]
@@ -57,7 +57,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = ">=1.25.4,<1.27"
 
 [package.extras]
-crt = ["awscrt (==0.15.3)"]
+crt = ["awscrt (==0.16.9)"]
 
 [[package]]
 name = "cachetools"
@@ -863,4 +863,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "70de1aadaba043a91c6ab9aed857cc022b799cde7fc8ea2a2cd5c91131e87dad"
+content-hash = "7e3b7e344a776571e07b859a4738665e67054921aad95ec9cf5f7b8cc59ae1d9"
