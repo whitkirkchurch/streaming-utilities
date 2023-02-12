@@ -17,7 +17,6 @@ SPACING_BETWEEN_TEXT = 8
 
 class YoutubeThumbnail:
     def __init__(self, service):
-
         self.service = service
 
     @property
@@ -26,7 +25,6 @@ class YoutubeThumbnail:
 
     @property
     def generated_image_hash(self):
-
         data_hash_dict = {
             "image": self.service_image_path,
             "title": self.service.title_string,
@@ -45,9 +43,7 @@ class YoutubeThumbnail:
         )
 
     def generate(self):
-
         with Image.open(self.service_image_path) as thumb_image:
-
             # Thumbnail the image, which handles cropping and resizing down (but not up)
             thumb_image.thumbnail(TARGET_THUMBNAIL_DIMENSIONS)
 

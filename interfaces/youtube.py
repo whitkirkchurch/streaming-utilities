@@ -74,7 +74,6 @@ class Api:  # pragma: no cover
 
 
 class Playlist:
-
     videos_in_list = []
 
     def __init__(self, youtube, playlist_id):
@@ -84,12 +83,10 @@ class Playlist:
         self.load_list_items()
 
     def load_list_items(self, pagination_token=None):
-
         items_to_load = True
         video_list = []
 
         while items_to_load:
-
             request = self.youtube.client.playlistItems().list(
                 part="snippet",
                 maxResults=50,
@@ -118,16 +115,13 @@ class Playlist:
 
 
 class PlaylistManager:
-
     playlists = {}
 
     def __init__(self):
-
         self.youtube = Api()
 
     def get(self, playlist_id):
         if playlist_id not in self.playlists:
-
             self.playlists[playlist_id] = Playlist(self.youtube, playlist_id)
 
         return self.playlists[playlist_id]

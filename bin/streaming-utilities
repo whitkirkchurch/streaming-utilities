@@ -86,7 +86,6 @@ def utilities():
 
 @utilities.command()
 def import_from_churchsuite():
-
     cs = churchsuite.Account(CHURCHSUITE_ACCOUNT)
 
     click.echo(click.style("Loading events from ChurchSuite…", fg="blue"))
@@ -98,7 +97,6 @@ def import_from_churchsuite():
     events_to_sync = {}
 
     for event in churchsuite_events:
-
         event_id = str(event.id)
 
         events_to_sync[event_id] = {
@@ -116,7 +114,6 @@ def import_from_churchsuite():
     click.echo(click.style("Comparing and synchronising…", fg="blue"))
 
     for event_sync_identifier, event in events_to_sync.items():
-
         click.echo(
             click.style(
                 "Searching for event {event_id}".format(event_id=event_sync_identifier)
@@ -154,7 +151,6 @@ def import_from_churchsuite():
 @utilities.command()
 @click.option("--send-email/--dry-run", default=False)
 def send_report(send_email):
-
     click.echo(click.style("Sending email report", fg="blue"))
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
@@ -173,7 +169,6 @@ def send_report(send_email):
     next_week = datetime.datetime.today().astimezone() + datetime.timedelta(weeks=1)
 
     for service_object in services.upcoming_streaming_services():
-
         if service_object.datetime >= next_week:
             email_variables["services_later"].append(service_object.service_data)
         else:
@@ -219,7 +214,6 @@ def send_report(send_email):
 @utilities.command()
 @click.option("--update/--preview", default=False)
 def sync_with_youtube(update):
-
     click.echo(click.style("Synchronising with YouTube", fg="blue"))
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -266,7 +260,6 @@ def sync_with_youtube(update):
     )
 
     for service_object in services.upcoming_streaming_services():
-
         click.echo(service_object.title_string_with_date)
 
         # Actually build objects and perform updates
@@ -287,7 +280,6 @@ def sync_with_youtube(update):
             youtube_description = service_object.description
 
         try:
-
             resource_body = {
                 "snippet": {
                     "scheduledStartTime": service_object.datetime.isoformat(),
@@ -300,7 +292,6 @@ def sync_with_youtube(update):
             }
 
             if service_object.youtube_id:
-
                 click.echo("YouTube ID found, updating!")
 
                 resource_body["id"] = service_object.youtube_id
@@ -311,7 +302,6 @@ def sync_with_youtube(update):
                 )
 
             else:
-
                 click.echo(click.style("No YouTube ID found, creating!", fg="green"))
 
                 request = youtube.liveBroadcasts().insert(
@@ -364,14 +354,12 @@ def sync_with_youtube(update):
                 )
 
             if service_object.service_image:
-
                 service_thumbnail = YoutubeThumbnail(service_object)
 
                 if (
                     service_object.youtube_image_last_uploaded_name
                     != service_thumbnail.generated_image_hash
                 ):
-
                     click.echo("Image has changed, replacing")
 
                     service_thumbnail.generate()
@@ -402,9 +390,7 @@ def sync_with_youtube(update):
 
             # Now, add to playlists!
             for playlist in service_object.youtube_playlists_for_service:
-
                 if update:
-
                     if not video_in_playlist(response["id"], playlist):
                         click.echo("Adding to playlist {}...".format(playlist))
                         playlist_request = youtube.playlistItems().insert(
@@ -443,7 +429,6 @@ def sync_with_youtube(update):
 @utilities.command()
 @click.option("--update/--preview", default=False)
 def sync_with_wordpress(update):
-
     click.echo(click.style("Synchronising with Wordpress", fg="blue"))
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
@@ -453,7 +438,6 @@ def sync_with_wordpress(update):
     previous_service = None
 
     for service_object in services.upcoming_services_with_oos():
-
         click.echo(service_object.title_string)
 
         wordpress.create_or_update_oos_entry(
@@ -467,7 +451,6 @@ def sync_with_wordpress(update):
     click.echo(click.style("Syncing podcasts…", fg="blue"))
 
     for service_object in services.upcoming_streaming_services():
-
         click.echo(service_object.title_string)
 
         wordpress.create_or_update_podcast_entry(

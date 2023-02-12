@@ -30,7 +30,6 @@ def auth_header():
 def create_or_update_oos_entry(
     service_object, previous_service, services_table, update
 ):
-
     # Establish service defaults
 
     service_image = None
@@ -98,12 +97,10 @@ def create_or_update_oos_entry(
         media_resource_body["post"] = service_object.order_of_service_id
 
     if featured_image_id:
-
         click.echo("Featured image known!")
 
         # Is this a service-specific image?
         if service_object.churchsuite_image_field:
-
             click.echo("Featured image is service-specific")
 
             # Get the resource metadata, so we can compare the filename
@@ -172,7 +169,6 @@ def create_or_update_oos_entry(
                         )
 
         else:
-
             # This featured image ID comes from a default somewhere.
             # Just push it to Airtable.
 
@@ -188,7 +184,6 @@ def create_or_update_oos_entry(
             resource_body["featured_media"] = int(featured_image_id)
 
     elif service_image:
-
         click.echo("No featured image ID known, uploading!")
 
         fileName = os.path.basename(service_image)
@@ -225,7 +220,6 @@ def create_or_update_oos_entry(
                 click.echo(click.style("In preview mode, skipping upload", fg="yellow"))
 
     if service_object.order_of_service_id:
-
         click.echo("Order of Service ID found, updating!")
 
         if update:
@@ -242,7 +236,6 @@ def create_or_update_oos_entry(
             click.echo(click.style("In preview mode, skipping creation", fg="yellow"))
 
     else:
-
         click.echo(click.style("No Order of Service ID found, creating!", fg="green"))
 
         resource_body["status"] = "draft"
@@ -260,7 +253,6 @@ def create_or_update_oos_entry(
 
 
 def create_or_update_podcast_entry(service_object, services_table, update):
-
     podcast_resource_body = {
         "title": service_object.title_string,
         "slug": service_object.slug,
@@ -269,7 +261,6 @@ def create_or_update_podcast_entry(service_object, services_table, update):
     }
 
     if service_object.podcast_id:
-
         click.echo("Podcast ID found, updating!")
 
         if update:
@@ -286,7 +277,6 @@ def create_or_update_podcast_entry(service_object, services_table, update):
             click.echo(click.style("In preview mode, skipping creation", fg="yellow"))
 
     else:
-
         click.echo(click.style("No Podcast ID found, creating!", fg="green"))
 
         podcast_resource_body["status"] = "draft"
