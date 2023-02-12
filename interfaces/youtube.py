@@ -74,7 +74,7 @@ class Api:  # pragma: no cover
 
 
 class Playlist:
-    videos_in_list = []
+    videos_in_list: list[str] = []
 
     def __init__(self, youtube, playlist_id):
         self.youtube = youtube
@@ -115,7 +115,7 @@ class Playlist:
 
 
 class PlaylistManager:
-    playlists = {}
+    playlists: dict[str, Playlist] = {}
 
     def __init__(self):
         self.youtube = Api()

@@ -353,7 +353,7 @@ class testService(unittest.TestCase):
         {"456": {"default_thumbnail": "override.jpg"}},
     )
     @patch("services.download_service_image")
-    def test_has_category_specific_image(self, download_image):
+    def test_service_image(self, download_image):
         service_with_specific_image_without_category = serviceFactory(
             {
                 AIRTABLE_MAP["churchsuite_image"]: [
