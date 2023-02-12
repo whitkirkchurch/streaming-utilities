@@ -6,7 +6,6 @@ from services import AIRTABLE_MAP, Service
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
-
     return Service({"id": id, "fields": fields})
 
 
@@ -59,7 +58,6 @@ def test_generated_image_path():
     1,
 )
 def test_generate_saves_image_with_single_line_title():
-
     service = serviceFactory(
         {
             AIRTABLE_MAP["name"]: "Test Service",
@@ -80,7 +78,6 @@ def test_generate_saves_image_with_single_line_title():
     1,
 )
 def test_generate_saves_image_with_multi_line_title():
-
     service = serviceFactory(
         {
             AIRTABLE_MAP[

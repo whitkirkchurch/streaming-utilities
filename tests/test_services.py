@@ -11,52 +11,43 @@ from services import (
 
 
 def serviceFactory(fields, id="a1b2c3d4"):
-
     return Service({"id": id, "fields": fields})
 
 
 class testService(unittest.TestCase):
     def test_slug_field(self):
-
         service = serviceFactory({AIRTABLE_MAP["slug"]: "test-service"})
         self.assertEqual(service.slug, "test-service")
 
     def test_type_field(self):
-
         service = serviceFactory({AIRTABLE_MAP["type"]: "Regular Service"})
         self.assertEqual(service.type_field, "Regular Service")
 
     def test_service_name_field(self):
-
         service = serviceFactory({AIRTABLE_MAP["name"]: "Test Service"})
         self.assertEqual(service.name_field, "Test Service")
 
     def test_liturgical_name_field_returns_if_present(self):
-
         service = serviceFactory(
             {AIRTABLE_MAP["liturgical_name"]: "Test Liturgical Name"}
         )
         self.assertEqual(service.liturgical_name_field, "Test Liturgical Name")
 
     def test_liturgical_name_field_returns_none_if_missing(self):
-
         service = serviceFactory({})
         self.assertIsNone(service.liturgical_name_field)
 
     def test_location(self):
-
         service = serviceFactory({AIRTABLE_MAP["location"]: "Some Place"})
         self.assertEqual(service.location, "Some Place")
 
     def test_technician_field(self):
-
         service = serviceFactory(
             {AIRTABLE_MAP["technician"]: {"name": "Test Technician"}}
         )
         self.assertEqual(service.technician_field, {"name": "Test Technician"})
 
     def test_technician_name_field(self):
-
         service_with_technician = serviceFactory(
             {AIRTABLE_MAP["technician"]: {"name": "Test Technician"}}
         )
@@ -68,22 +59,18 @@ class testService(unittest.TestCase):
         self.assertIsNone(service_without_technician.technician_name)
 
     def test_churchsuite_category_id(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
         self.assertEqual(service.churchsuite_category_id, "123")
 
     def test_order_of_service_id(self):
-
         service = serviceFactory({AIRTABLE_MAP["oos_id"]: "1234"})
         self.assertEqual(service.order_of_service_id, "1234")
 
     def test_podcast_id(self):
-
         service = serviceFactory({AIRTABLE_MAP["podcast_id"]: "2345"})
         self.assertEqual(service.podcast_id, "2345")
 
     def test_youtube_id(self):
-
         service = serviceFactory({AIRTABLE_MAP["youtube_id"]: "a1-b2_c3"})
         self.assertEqual(service.youtube_id, "a1-b2_c3")
 
@@ -94,29 +81,24 @@ class testService(unittest.TestCase):
         self.assertEqual(service.churchsuite_image_field, {"id": "tEsTiMaGeId"})
 
     def test_wordpress_image_id(self):
-
         service = serviceFactory({AIRTABLE_MAP["wp_image_id"]: "3456"})
         self.assertEqual(service.wordpress_image_id, "3456")
 
     def test_wordpress_image_last_uploaded_name(self):
-
         service = serviceFactory({AIRTABLE_MAP["wp_image_last_uploaded_name"]: "3456"})
         self.assertEqual(service.wordpress_image_last_uploaded_name, "3456")
 
     def test_youtube_image_last_uploaded_name(self):
-
         service = serviceFactory(
             {AIRTABLE_MAP["youtube_image_last_uploaded_name"]: "thumbnail.jpg"}
         )
         self.assertEqual(service.youtube_image_last_uploaded_name, "thumbnail.jpg")
 
     def test_datetime_field(self):
-
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})
         self.assertEqual(service.datetime_field, "2022-01-01T10:00:00.000Z")
 
     def test_datetime(self):
-
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})
         self.assertIsInstance(service.datetime, datetime)
         self.assertEqual(service.datetime.isoformat(), "2022-01-01T10:00:00+00:00")
@@ -129,7 +111,6 @@ class testService(unittest.TestCase):
         )
 
     def test_datetime_as_naive_string(self):
-
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})
         self.assertEqual(service.datetime_as_naive_string, "2022-01-01 10:00:00")
 
@@ -139,7 +120,6 @@ class testService(unittest.TestCase):
         self.assertEqual(service_in_bst.datetime_as_naive_string, "2022-08-01 10:00:00")
 
     def test_datetime_to_publish_order_of_service(self):
-
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-02T10:00:00.000Z"})
         self.assertEqual(
             service.datetime_to_publish_order_of_service.replace(tzinfo=None),
@@ -147,7 +127,6 @@ class testService(unittest.TestCase):
         )
 
     def test_datetime_to_publish_order_of_service_given_previous_service_is_none(self):
-
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-02T10:00:00.000Z"})
         self.assertEqual(
             service.datetime_to_publish_order_of_service_given_previous_service(
@@ -159,7 +138,6 @@ class testService(unittest.TestCase):
     def test_datetime_to_publish_order_of_service_given_previous_service_is_over_24h(
         self,
     ):
-
         previous_service = serviceFactory(
             {AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"}
         )
@@ -174,7 +152,6 @@ class testService(unittest.TestCase):
     def test_datetime_to_publish_order_of_service_given_previous_service_is_within_24h(
         self,
     ):
-
         previous_service = serviceFactory(
             {AIRTABLE_MAP["datetime"]: "2022-01-02T10:00:00.000Z"}
         )
@@ -187,12 +164,10 @@ class testService(unittest.TestCase):
         )
 
     def test_streaming_field(self):
-
         service = serviceFactory({AIRTABLE_MAP["streaming"]: "Yes"})
         self.assertEqual(service.streaming_field, "Yes")
 
     def test_is_streaming(self):
-
         service_streaming_yes = serviceFactory({AIRTABLE_MAP["streaming"]: "Yes"})
 
         service_streaming_no = serviceFactory({AIRTABLE_MAP["streaming"]: "No"})
@@ -206,7 +181,6 @@ class testService(unittest.TestCase):
         self.assertFalse(service_without_streaming.is_streaming)
 
     def test_is_stream_public(self):
-
         service_public_yes = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
 
         service_public_no = serviceFactory({})
@@ -216,7 +190,6 @@ class testService(unittest.TestCase):
         self.assertFalse(service_public_no.is_stream_public)
 
     def test_has_oos(self):
-
         service_oos_yes = serviceFactory({AIRTABLE_MAP["has_oos"]: True})
 
         service_oos_no = serviceFactory({})
@@ -226,7 +199,6 @@ class testService(unittest.TestCase):
         self.assertFalse(service_oos_no.has_oos)
 
     def test_is_fee_payable(self):
-
         service_payable_yes = serviceFactory({AIRTABLE_MAP["fee_payable"]: True})
 
         service_payable_no = serviceFactory({})
@@ -236,7 +208,6 @@ class testService(unittest.TestCase):
         self.assertFalse(service_payable_no.is_fee_payable)
 
     def test_title_string(self):
-
         service_with_no_liturgical_name = serviceFactory(
             {AIRTABLE_MAP["name"]: "Test Service"}
         )
@@ -255,7 +226,6 @@ class testService(unittest.TestCase):
         )
 
     def test_title_string_with_date(self):
-
         service = serviceFactory(
             {
                 AIRTABLE_MAP["name"]: "Test Service",
@@ -266,7 +236,6 @@ class testService(unittest.TestCase):
         self.assertEqual(service.title_string_with_date, "Test Service: 1 January 2022")
 
     def test_described_as(self):
-
         standard_service = serviceFactory({AIRTABLE_MAP["name"]: "Test Service"})
 
         said_eucharist_service = serviceFactory(
@@ -294,7 +263,6 @@ class testService(unittest.TestCase):
         self.assertEqual(evensong_service.described_as, "service of Choral Evensong")
 
     def test_service_description(self):
-
         standard_service = serviceFactory({AIRTABLE_MAP["name"]: "Test Service"})
 
         standard_service_at_location = serviceFactory(
@@ -351,7 +319,6 @@ class testService(unittest.TestCase):
         )
 
     def test_has_service_specific_image(self):
-
         service_with_specific_image = serviceFactory(
             {
                 AIRTABLE_MAP["churchsuite_image"]: [
@@ -371,7 +338,6 @@ class testService(unittest.TestCase):
         {"456": {"default_thumbnail": "override.jpg"}},
     )
     def test_has_category_specific_image(self):
-
         service_without_override = serviceFactory(
             {AIRTABLE_MAP["churchsuite_category_id"]: "123"}
         )
@@ -387,8 +353,7 @@ class testService(unittest.TestCase):
         {"456": {"default_thumbnail": "override.jpg"}},
     )
     @patch("services.download_service_image")
-    def test_has_category_specific_image(self, download_image):
-
+    def test_service_image(self, download_image):
         service_with_specific_image_without_category = serviceFactory(
             {
                 AIRTABLE_MAP["churchsuite_image"]: [
@@ -435,7 +400,6 @@ class testService(unittest.TestCase):
         {"456": {"default_thumbnail": "test.jpg"}},
     )
     def test_has_category_behaviour_overrides(self):
-
         service_without_override = serviceFactory(
             {AIRTABLE_MAP["churchsuite_category_id"]: "123"}
         )
@@ -451,7 +415,6 @@ class testService(unittest.TestCase):
         {"456": {"default_thumbnail": "test.jpg"}},
     )
     def test_category_behaviour_overrides(self):
-
         service_without_override = serviceFactory(
             {AIRTABLE_MAP["churchsuite_category_id"]: "123"}
         )
@@ -467,7 +430,6 @@ class testService(unittest.TestCase):
 
     @patch("services.YOUTUBE_DEFAULT_PLAYLIST_ID", "PlAyLiStId")
     def test_youtube_playlists_for_service_with_no_overrides(self):
-
         service = serviceFactory({})
 
         self.assertEqual(len(service.youtube_playlists_for_service), 1)
@@ -479,7 +441,6 @@ class testService(unittest.TestCase):
         {"123": {"youtube_playlists": {"ExTrApLaYlIsT"}}},
     )
     def test_youtube_playlists_for_service_with_additional_category(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
 
         self.assertEqual(len(service.youtube_playlists_for_service), 2)
@@ -496,7 +457,6 @@ class testService(unittest.TestCase):
         },
     )
     def test_youtube_playlists_for_service_with_exclude_category(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
 
         self.assertEqual(len(service.youtube_playlists_for_service), 0)
@@ -513,7 +473,6 @@ class testService(unittest.TestCase):
         },
     )
     def test_youtube_playlists_for_service_with_additional_and_exclude_category(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
 
         self.assertEqual(len(service.youtube_playlists_for_service), 1)
@@ -531,7 +490,6 @@ class testService(unittest.TestCase):
         },
     )
     def test_youtube_playlists_for_service_exclude_takes_precedence(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
 
         self.assertNotIn("ExTrApLaYlIsT", service.youtube_playlists_for_service)
@@ -542,14 +500,12 @@ class testService(unittest.TestCase):
         {"123": {"youtube_playlists": {"PlAyLiStId"}}},
     )
     def test_youtube_playlists_for_service_deduplicates(self):
-
         service = serviceFactory({AIRTABLE_MAP["churchsuite_category_id"]: "123"})
 
         self.assertEqual(len(service.youtube_playlists_for_service), 1)
         self.assertIn("PlAyLiStId", service.youtube_playlists_for_service)
 
     def test_youtube_is_embeddable(self):
-
         service_public_yes = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
 
         service_public_no = serviceFactory({})
@@ -559,7 +515,6 @@ class testService(unittest.TestCase):
         self.assertFalse(service_public_no.youtube_is_embeddable)
 
     def test_youtube_privacy(self):
-
         service_public_yes = serviceFactory({AIRTABLE_MAP["stream_public"]: True})
 
         service_public_no = serviceFactory({})
@@ -572,7 +527,6 @@ class testService(unittest.TestCase):
 class testServiceFunctions(unittest.TestCase):
     @patch("services.urllib.request.urlretrieve")
     def test_download_service_image(self, urlretrieve):
-
         download_service_image("https://example.com/test.jpg", "test.jpg")
 
         urlretrieve.assert_called_with(

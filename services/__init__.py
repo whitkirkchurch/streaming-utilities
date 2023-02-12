@@ -68,7 +68,6 @@ TZ_LONDON = pytz.timezone("Europe/London")
 
 
 def upcoming_streaming_services():
-
     return [
         Service(service)
         for service in airtable.services_table().all(
@@ -83,7 +82,6 @@ def upcoming_streaming_services():
 
 
 def upcoming_services_with_oos():
-
     return [
         Service(service)
         for service in airtable.services_table().all(
@@ -117,13 +115,11 @@ class Service:
         self.airtable_fields = airtable_object["fields"]
 
         if self.churchsuite_category_id in CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES:
-
             self.category_overrides = CHURCHSUITE_CATEGORY_BEHAVIOUR_OVERRIDES[
                 self.churchsuite_category_id
             ]
 
         else:
-
             self.category_overrides = {}
 
     @property
@@ -243,7 +239,6 @@ class Service:
 
     @property
     def title_string(self):
-
         title_string = (
             self.liturgical_name_field
             if self.liturgical_name_field
@@ -255,14 +250,12 @@ class Service:
 
     @property
     def title_string_with_date(self):
-
         return self.title_string + ": {date}".format(
             date=self.datetime.strftime("%-d %B %Y"),
         )
 
     @property
     def described_as(self):
-
         if "describe_service_as" in self.category_overrides:
             return self.category_overrides["describe_service_as"]
 
@@ -293,7 +286,6 @@ class Service:
 
     @property
     def service_data(self):
-
         return {
             "url": "https://airtable.com/{base_id}/{table_id}/{item_id}".format(
                 base_id=AIRTABLE_BASE_ID,
@@ -321,7 +313,6 @@ class Service:
 
     @property
     def service_image(self):
-
         # Service-specific image squashes category defaults
         if self.has_service_specific_image:
             image_data = self.churchsuite_image_field[0]
@@ -344,7 +335,6 @@ class Service:
     def datetime_to_publish_order_of_service_given_previous_service(
         self, previous_service=None
     ):
-
         if previous_service:
             return max(
                 self.datetime_to_publish_order_of_service,
@@ -374,7 +364,6 @@ class Service:
         }
 
         if self.has_category_behaviour_overrides:
-
             if "youtube_playlists" in self.category_behaviour_overrides:
                 playlists = playlists.union(
                     self.category_behaviour_overrides["youtube_playlists"]
