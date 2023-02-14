@@ -3,24 +3,41 @@ name: Tests
 on: [push]
 
 jobs:
-  test:
+  static-analysis:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version-file: ".python-version"
 
-      - uses: snok/install-poetry@v1
-
-      - name: Install dependencies
-        run: poetry install
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.0
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: poetry install
 
       - name: Run tests
         run: poetry run script/test
