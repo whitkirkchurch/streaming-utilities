@@ -21,6 +21,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import datetime
+from typing import TypedDict
 
 import boto3
 import botocore
@@ -79,13 +80,20 @@ s3 = boto3.resource(
 bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
 
+class EmailReportVariablesDict(TypedDict):
+    services_this_week: list
+    services_later: list
+    services_undecided: list
+    send_time_string: str
+
+
 @click.group(chain=True)
-def utilities():
+def utilities() -> None:
     pass
 
 
 @utilities.command()
-def import_from_churchsuite():
+def import_from_churchsuite() -> None:
     cs = churchsuite.Account(CHURCHSUITE_ACCOUNT)
 
     click.echo(click.style("Loading events from ChurchSuite…", fg="blue"))
@@ -150,7 +158,7 @@ def import_from_churchsuite():
 
 @utilities.command()
 @click.option("--send-email/--dry-run", default=False)
-def send_report(send_email):
+def send_report(send_email: bool) -> None:
     click.echo(click.style("Sending email report", fg="blue"))
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
@@ -159,7 +167,7 @@ def send_report(send_email):
 
     now = datetime.datetime.now()
 
-    email_variables = {
+    email_variables: EmailReportVariablesDict = {
         "services_this_week": [],
         "services_later": [],
         "services_undecided": [],
@@ -213,7 +221,7 @@ def send_report(send_email):
 
 @utilities.command()
 @click.option("--update/--preview", default=False)
-def sync_with_youtube(update):
+def sync_with_youtube(update: bool) -> None:
     click.echo(click.style("Synchronising with YouTube", fg="blue"))
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -428,7 +436,7 @@ def sync_with_youtube(update):
 
 @utilities.command()
 @click.option("--update/--preview", default=False)
-def sync_with_wordpress(update):
+def sync_with_wordpress(update: bool) -> None:
     click.echo(click.style("Synchronising with Wordpress", fg="blue"))
 
     click.echo(click.style("Getting services from Airtable…", fg="blue"))
