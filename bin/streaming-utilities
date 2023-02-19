@@ -21,7 +21,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import datetime
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 import boto3
 import botocore
@@ -85,6 +85,22 @@ class EmailReportVariablesDict(TypedDict):
     services_later: list
     services_undecided: list
     send_time_string: str
+
+
+class YoutubeResourceBodySnippetDict(TypedDict):
+    title: str
+    description: str
+    scheduledStartTime: str
+
+
+class YoutubeResourceBodyStatusDict(TypedDict):
+    privacyStatus: str
+
+
+class YoutubeResourceBodyDict(TypedDict):
+    id: NotRequired[str]
+    snippet: YoutubeResourceBodySnippetDict
+    status: YoutubeResourceBodyStatusDict
 
 
 @click.group(chain=True)
@@ -177,7 +193,7 @@ def send_report(send_email: bool) -> None:
     next_week = datetime.datetime.today().astimezone() + datetime.timedelta(weeks=1)
 
     for service_object in services.upcoming_streaming_services():
-        if service_object.datetime >= next_week:
+        if service_object.datetime_localised >= next_week:
             email_variables["services_later"].append(service_object.service_data)
         else:
             email_variables["services_this_week"].append(service_object.service_data)
@@ -288,9 +304,9 @@ def sync_with_youtube(update: bool) -> None:
             youtube_description = service_object.description
 
         try:
-            resource_body = {
+            resource_body: YoutubeResourceBodyDict = {
                 "snippet": {
-                    "scheduledStartTime": service_object.datetime.isoformat(),
+                    "scheduledStartTime": service_object.datetime_localised.isoformat(),
                     "title": service_object.title_string_with_date,
                     "description": youtube_description,
                 },

@@ -100,14 +100,16 @@ class testService(unittest.TestCase):
 
     def test_datetime(self):
         service = serviceFactory({AIRTABLE_MAP["datetime"]: "2022-01-01T10:00:00.000Z"})
-        self.assertIsInstance(service.datetime, datetime)
-        self.assertEqual(service.datetime.isoformat(), "2022-01-01T10:00:00+00:00")
+        self.assertIsInstance(service.datetime_localised, datetime)
+        self.assertEqual(
+            service.datetime_localised.isoformat(), "2022-01-01T10:00:00+00:00"
+        )
 
         service_in_bst = serviceFactory(
             {AIRTABLE_MAP["datetime"]: "2022-08-01T09:00:00.000Z"}
         )
         self.assertEqual(
-            service_in_bst.datetime.isoformat(), "2022-08-01T10:00:00+01:00"
+            service_in_bst.datetime_localised.isoformat(), "2022-08-01T10:00:00+01:00"
         )
 
     def test_datetime_as_naive_string(self):

@@ -256,7 +256,7 @@ def create_or_update_podcast_entry(service_object, services_table, update):
     podcast_resource_body = {
         "title": service_object.title_string,
         "slug": service_object.slug,
-        "date": service_object.datetime.isoformat(),
+        "date": service_object.datetime_localised.isoformat(),
         "content": "<p>{}</p>".format(service_object.description),
     }
 

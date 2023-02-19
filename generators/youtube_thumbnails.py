@@ -28,7 +28,7 @@ class YoutubeThumbnail:
         data_hash_dict = {
             "image": self.service_image_path,
             "title": self.service.title_string,
-            "datetime": self.service.datetime.strftime("%-d %B %Y"),
+            "datetime": self.service.datetime_localised.strftime("%-d %B %Y"),
             "version": GENERATOR_VERSION,
         }
 
@@ -56,7 +56,7 @@ class YoutubeThumbnail:
 
             # Text we want to actually write
             main_text = self.service.title_string
-            aux_text = self.service.datetime.strftime("%-d %B %Y")
+            aux_text = self.service.datetime_localised.strftime("%-d %B %Y")
 
             main_text_draw_coordinates = (
                 LEFT_MARGIN,

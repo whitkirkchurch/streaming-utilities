@@ -7,7 +7,7 @@
             <hr class="itembreak">
             <h3><a href="{{ service.url }}">{{ service.title }}</a></h3>
             <p><b>{{ service.type }}<br>
-            {{ service.datetime }}</b></p>
+            {{ service.datetime_localised }}</b></p>
             {% if service.streaming %}
             <p>{% if service.technician %}Streaming lead: {{ service.technician }}{% else %}<b style="color:red">No technician has been assigned to this service!</b>{% endif %}</p>
             {% endif %}
