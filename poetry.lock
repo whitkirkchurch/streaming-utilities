@@ -21,18 +21,18 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 
 [[package]]
 name = "boto3"
-version = "1.26.97"
+version = "1.26.104"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.97-py3-none-any.whl", hash = "sha256:367a73c1ff04517849d8c4177fd775da2e258a3912ff6a497be258c30f509046"},
-    {file = "boto3-1.26.97.tar.gz", hash = "sha256:19762b6a1adbe1963e26b8280211ca148017c970a2e1386312a9fc8a0a17dbd5"},
+    {file = "boto3-1.26.104-py3-none-any.whl", hash = "sha256:308c5a8293d9b76e74921f4d945be19cc467b92e5f128df1db76e31c71345bb3"},
+    {file = "boto3-1.26.104.tar.gz", hash = "sha256:bcd09f16bdf3d71ab7d0fab20e97242f09c63f4cea0943329521ab35a950f900"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.97,<1.30.0"
+botocore = ">=1.29.104,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -41,14 +41,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.97"
+version = "1.29.104"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.97-py3-none-any.whl", hash = "sha256:0df677eb2bef3ba18ac69e007633559b4426df310eee99df9882437b5faf498a"},
-    {file = "botocore-1.29.97.tar.gz", hash = "sha256:176740221714c0f031c2cd773879df096dbc0f977c63b3e2ed6a956205f02e82"},
+    {file = "botocore-1.29.104-py3-none-any.whl", hash = "sha256:932bfbf580a2ae53f471df4bfbebce531985ee27468cf7c37d7ccfb3cf8bc9e4"},
+    {file = "botocore-1.29.104.tar.gz", hash = "sha256:7e7a01cef10b1daa9cb01ec25a15e831e7359fc43d1b591359710f203c3620a8"},
 ]
 
 [package.dependencies]
@@ -957,4 +957,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "f02c5c84871b2580ec53b01a17cd0717a8b549ffae03cba1d5c37b6897581358"
+content-hash = "0c89325f832a5dc05a3cfc07d7a42162c545270f310a8876e710005f33adfcf5"
