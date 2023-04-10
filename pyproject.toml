@@ -16,7 +16,7 @@ requests-toolbelt = "^0.10.1"
 rollbar = "^0.16.3"
 pytz = "^2022.7"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", rev = "v0.1.4", develop=false}
-pytest = "^7.2.1"
+pytest = "^7.3.0"
 pillow = "^9.4.0"
 
 [tool.poetry.dev-dependencies]
