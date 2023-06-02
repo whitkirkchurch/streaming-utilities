@@ -21,18 +21,18 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 
 [[package]]
 name = "boto3"
-version = "1.26.97"
+version = "1.26.145"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.97-py3-none-any.whl", hash = "sha256:367a73c1ff04517849d8c4177fd775da2e258a3912ff6a497be258c30f509046"},
-    {file = "boto3-1.26.97.tar.gz", hash = "sha256:19762b6a1adbe1963e26b8280211ca148017c970a2e1386312a9fc8a0a17dbd5"},
+    {file = "boto3-1.26.145-py3-none-any.whl", hash = "sha256:77e8fa7c257f9ed8bfe0c3ffc2ccc47b1cfa27058f99415b6003699d1202e0c0"},
+    {file = "boto3-1.26.145.tar.gz", hash = "sha256:30f8ab1cf89d5864a80ba2d5eb5316dbd2a63c9469877e0cffb522630438aa85"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.97,<1.30.0"
+botocore = ">=1.29.145,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -41,14 +41,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.97"
+version = "1.29.145"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.97-py3-none-any.whl", hash = "sha256:0df677eb2bef3ba18ac69e007633559b4426df310eee99df9882437b5faf498a"},
-    {file = "botocore-1.29.97.tar.gz", hash = "sha256:176740221714c0f031c2cd773879df096dbc0f977c63b3e2ed6a956205f02e82"},
+    {file = "botocore-1.29.145-py3-none-any.whl", hash = "sha256:264a3f19ed280d80711b7e278be09acff7ed379a96432fdf179b4e6e3a687e6a"},
+    {file = "botocore-1.29.145.tar.gz", hash = "sha256:65e2a2b1cc70583225f87d6d63736215f93c6234721967bdab872270ba7a1f45"},
 ]
 
 [package.dependencies]
@@ -957,4 +957,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "f02c5c84871b2580ec53b01a17cd0717a8b549ffae03cba1d5c37b6897581358"
+content-hash = "0b619eed7d5a5794d4c416640d658ed043e6f01924b22a670455fe9de9783610"
