@@ -715,17 +715,18 @@ files = [
 
 [[package]]
 name = "pyairtable"
-version = "1.4.0"
+version = "1.5.0"
 description = "Python Client for the Airtable API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyairtable-1.4.0-py2.py3-none-any.whl", hash = "sha256:f127af0796bfe40d349937b4c1a0ff81b7740fc3c8ebd0e6d0e559f42026be4b"},
-    {file = "pyairtable-1.4.0.tar.gz", hash = "sha256:e2e9cf7b14afcf5bac69f79f6a61e61bb8c8ff94656e9c7ebeef406c0fbfbb8c"},
+    {file = "pyairtable-1.5.0-py2.py3-none-any.whl", hash = "sha256:078680e2db70e6fbd3e006ed0b4cce52ffe4e6954d63b0f5851bdc979f4d25b6"},
+    {file = "pyairtable-1.5.0.tar.gz", hash = "sha256:1f02ec80d66c81cdef250a4592463e50c61bc2cb1de5939db67df3cdc5c2a03d"},
 ]
 
 [package.dependencies]
-requests = ">=2"
+requests = ">=2.22.0"
+urllib3 = "<2"
 
 [[package]]
 name = "pyasn1"
