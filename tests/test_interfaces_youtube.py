@@ -6,7 +6,7 @@ from interfaces.youtube import Playlist, PlaylistManager
 
 class testYoutubePlaylist(unittest.TestCase):
     @patch("interfaces.youtube.Api")
-    def test_load_items(self, api):
+    def test_load_items(self, api) -> None:
         api.client.playlistItems().list().execute.return_value = {
             "items": [
                 {
@@ -34,7 +34,7 @@ class testYoutubePlaylist(unittest.TestCase):
         self.assertEqual(playlist.videos_in_list, ["OnE", "tWo", "ThReE"])
 
     @patch("interfaces.youtube.Api")
-    def test_load_items_over_multiple_pages(self, api):
+    def test_load_items_over_multiple_pages(self, api) -> None:
         api.client.playlistItems().list().execute.side_effect = [
             {
                 "items": [
@@ -81,7 +81,7 @@ class testYoutubePlaylist(unittest.TestCase):
         )
 
     @patch("interfaces.youtube.Api")
-    def test_items(self, api):
+    def test_items(self, api) -> None:
         playlist = Playlist(api, "PlAyLiSt")
 
         playlist.videos_in_list = ["OnE", "tWo", "ThReE"]
@@ -91,13 +91,13 @@ class testYoutubePlaylist(unittest.TestCase):
 
 class testYoutubePlaylistManager(unittest.TestCase):
     @patch("interfaces.youtube.Api")
-    def test_returns_playlist(self, *args):
+    def test_returns_playlist(self, *args) -> None:
         manager = PlaylistManager()
 
         self.assertIsInstance(manager.get("PlAyLiSt"), Playlist)
 
     @patch("interfaces.youtube.Api")
-    def test_returns_existing_instance_for_list_where_present(self, *args):
+    def test_returns_existing_instance_for_list_where_present(self, *args) -> None:
         manager = PlaylistManager()
 
         playlist_1 = manager.get("PlAyLiSt")

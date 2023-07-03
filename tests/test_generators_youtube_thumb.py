@@ -1,15 +1,13 @@
 import os
 from unittest.mock import patch
 
+from factories import serviceFactory
+
 from generators.youtube_thumbnails import YoutubeThumbnail
-from services import AIRTABLE_MAP, Service
+from services import AIRTABLE_MAP
 
 
-def serviceFactory(fields, id="a1b2c3d4"):
-    return Service({"id": id, "fields": fields})
-
-
-def test_service_image_path():
+def test_service_image_path() -> None:
     service = serviceFactory({})
     youtube_thumbnail = YoutubeThumbnail(service)
 
@@ -22,7 +20,7 @@ def test_service_image_path():
     "generators.youtube_thumbnails.GENERATOR_VERSION",
     1,
 )
-def test_generated_image_hash():
+def test_generated_image_hash() -> None:
     service = serviceFactory(
         {
             AIRTABLE_MAP["name"]: "Test Service",
@@ -38,7 +36,7 @@ def test_generated_image_hash():
     "generators.youtube_thumbnails.GENERATOR_VERSION",
     1,
 )
-def test_generated_image_path():
+def test_generated_image_path() -> None:
     service = serviceFactory(
         {
             AIRTABLE_MAP["name"]: "Test Service",
@@ -57,7 +55,7 @@ def test_generated_image_path():
     "generators.youtube_thumbnails.GENERATOR_VERSION",
     1,
 )
-def test_generate_saves_image_with_single_line_title():
+def test_generate_saves_image_with_single_line_title() -> None:
     service = serviceFactory(
         {
             AIRTABLE_MAP["name"]: "Test Service",
@@ -77,7 +75,7 @@ def test_generate_saves_image_with_single_line_title():
     "generators.youtube_thumbnails.GENERATOR_VERSION",
     1,
 )
-def test_generate_saves_image_with_multi_line_title():
+def test_generate_saves_image_with_multi_line_title() -> None:
     service = serviceFactory(
         {
             AIRTABLE_MAP[
