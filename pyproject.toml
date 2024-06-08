@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "comms-utilities"
+name = "streaming-utilities"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "A set of utilities to help us manage our streaming services"
+authors = ["St Mary's Church, Whitkirk <tech@whitkirkchurch.org.uk>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "==3.11.8"
