@@ -915,18 +915,17 @@ requests = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "rollbar"
-version = "0.16.3"
+version = "1.0.0"
 description = "Easy and powerful exception tracking with Rollbar. Send messages and exceptions with arbitrary context, get back aggregates, and debug production issues quickly."
 optional = false
 python-versions = "*"
 files = [
-    {file = "rollbar-0.16.3-py3-none-any.whl", hash = "sha256:f06e23b36d7d1b547f32f287da9367b9bf53319f611da0ec9e891859507ac94e"},
-    {file = "rollbar-0.16.3.tar.gz", hash = "sha256:02313dfc60710ec736ab033d0f8c969d857a8b991cd67e0c1a91620e8a04ede2"},
+    {file = "rollbar-1.0.0-py3-none-any.whl", hash = "sha256:b7831cd8f2d2384e5922cdfb18897890c4ac4609fddfd2a821efe17b92cf1e58"},
+    {file = "rollbar-1.0.0.tar.gz", hash = "sha256:6347b7e49f22f0296fc287a6aea75d642cf64494d2ee127042a7a593c97df3af"},
 ]
 
 [package.dependencies]
-requests = {version = ">=0.12.1", markers = "python_version >= \"3.6\""}
-six = ">=1.9.0"
+requests = ">=0.12.1"
 
 [[package]]
 name = "rsa"
@@ -1000,4 +999,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "==3.11.8"
-content-hash = "9ac75fea5ba41cb1f93dbff44dc0fb035ede51eaa5710775fb220149ba2d2c37"
+content-hash = "48c8ed7fe75e8211bd68e45b189e111d25e786e678cf2ebdebae365586ca830b"

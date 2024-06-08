@@ -14,7 +14,7 @@ google-api-python-client = "^2.79.0"
 google-auth-oauthlib = "^1.0.0"
 boto3 = "^1.26.97"
 requests-toolbelt = "^1.0.0"
-rollbar = "^0.16.3"
+rollbar = "^1.0.0"
 pytz = "^2022.7"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", rev = "v0.1.5", develop=false}
 pytest = "^8.0.0"
