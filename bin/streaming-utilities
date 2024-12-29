@@ -136,7 +136,7 @@ def import_from_churchsuite() -> None:
         if event.object["images"]:
             events_to_sync[event_id]["image_url"] = event.object["images"]["lg"]["url"]
 
-        events_to_sync[event_id]['cancelled'] = event.object['status'] == 'cancelled'
+        events_to_sync[event_id]["cancelled"] = event.object["status"] == "cancelled"
 
     click.echo(click.style("Comparing and synchronising…", fg="blue"))
 
