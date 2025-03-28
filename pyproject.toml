@@ -20,11 +20,9 @@ churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", 
 pytest = "^8.0.0"
 pillow = "^10.0.0"
 
-[tool.poetry.dev-dependencies]
-coverage = "^7.1.0"
-
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
+coverage = "^7.1.0"
 
 [tool.isort]
 profile = "black"
