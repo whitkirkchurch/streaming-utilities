@@ -35,7 +35,7 @@ AIRTABLE_MAP = {
     "wp_image_last_uploaded_name": "Last uploaded Wordpress image name",
     "youtube_id": "YouTube ID",
     "youtube_image_last_uploaded_name": "Last uploaded YouTube thumbnail name",
-    "cancelled": "Cancelled?"
+    "cancelled": "Cancelled?",
 }
 
 YOUTUBE_DEFAULT_PLAYLIST_ID = "PLQl3S_pmB65sll8wZSQY-c5BXFzrygV1P"
