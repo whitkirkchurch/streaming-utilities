@@ -18,7 +18,7 @@ rollbar = "^1.0.0"
 pytz = "^2025.0"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities", rev = "e420387c2490c377c254ede0e0d61c54da1cf30c", develop=false}
 pytest = "^8.0.0"
-pillow = "^10.0.0"
+pillow = "^11.0.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.1.0"
