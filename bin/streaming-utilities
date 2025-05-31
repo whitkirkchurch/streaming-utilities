@@ -56,7 +56,7 @@ CHURCHSUITE_CATEGORIES_TO_SYNC = [
     "36",  # Messy Church
     "40",  # Said Eucharist
     "42",  # Sacred Space
-    "44:,  # Sanctuary
+    "44",  # Sanctuary
 ]
 
 MAILGUN_DOMAIN = os.environ["MAILGUN_DOMAIN"]
