@@ -182,7 +182,7 @@ requests = "^2.28.2"
 
 [package.source]
 type = "git"
-url = "https://github.com/whitkirkchurch/churchsuite-utilities"
+url = "https://github.com/whitkirkchurch/churchsuite-utilities.git"
 reference = "5efdc967370169643c1e693ed53d30819d8bbdfb"
 resolved_reference = "5efdc967370169643c1e693ed53d30819d8bbdfb"
 
@@ -1038,4 +1038,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.13.4"
-content-hash = "0ce85b31d005af1bbea18c8f6c1f7e6539a66001834338f9c1eb5c094e9ae421"
+content-hash = "5cc8b85d03242e0c36a24ad61d6866f4fb081113888d56cb4c24690c3f18662b"
