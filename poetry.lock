@@ -183,8 +183,8 @@ requests = "^2.28.2"
 [package.source]
 type = "git"
 url = "https://github.com/whitkirkchurch/churchsuite-utilities.git"
-reference = "9bb242a144fc2e0b6b9b1d59b3b1664b0e1b36ff"
-resolved_reference = "9bb242a144fc2e0b6b9b1d59b3b1664b0e1b36ff"
+reference = "9299deaeedd09f8f4dff9cc95f37729dcb12e2cf"
+resolved_reference = "9299deaeedd09f8f4dff9cc95f37729dcb12e2cf"
 
 [[package]]
 name = "click"
@@ -1038,4 +1038,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.13.6"
-content-hash = "8997da857c1d586fd3628529d5b555f6dbf6e510821b4e4f2b6d82902faa9328"
+content-hash = "ebff513ac5a86761806432f8593a810291dbec148b598cc02951dec68ac25e3c"
