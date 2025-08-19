@@ -21,7 +21,7 @@ pytest = "^8.0.0"
 pillow = "^11.0.0"
 
 [tool.poetry.group.dev.dependencies]
-coverage = "7.10.3"
+coverage = "7.10.4"
 
 [tool.isort]
 profile = "black"
