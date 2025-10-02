@@ -137,7 +137,7 @@ def create_or_update_oos_entry(
                     media_resource_body["file"] = (
                         fileName,
                         service_image_file,
-                        "image/jpg",
+                        "image/jpeg",
                     )
 
                     multipart_data = MultipartEncoder(media_resource_body)
