@@ -6,7 +6,7 @@ authors = ["St Mary's Church, Whitkirk <tech@whitkirkchurch.org.uk>"]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "==3.13.7"
+python = "==3.14.6"
 pyairtable = "1.5.0"
 click = "8.4.2"
 Jinja2 = "3.1.6"
