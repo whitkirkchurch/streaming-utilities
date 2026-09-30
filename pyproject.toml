@@ -16,7 +16,7 @@ boto3 = "1.43.103"
 requests-toolbelt = "1.0.0"
 rollbar = "1.5.0"
 pytz = "2025.2"
-churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities.git", rev = "577144fecafa4e9db8a579eefc885a953cad171e"}
+churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities.git", rev = "83dfa37f6c4167be259e00eec9367e83704f6434"}
 pytest = "9.1.1"
 pillow = "12.3.0"
 
