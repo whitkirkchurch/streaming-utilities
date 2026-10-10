@@ -647,7 +647,7 @@ files = [
 ]
 
 [package.dependencies]
-cryptography = {version = ">=38.0.3", markers = "python_version < \"3.14\""}
+cryptography = {version = ">=41.0.5", markers = "python_version >= \"3.14\""}
 pyasn1-modules = ">=0.2.1"
 
 [package.extras]
@@ -1367,5 +1367,5 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = "==3.13.7"
-content-hash = "87ea641bd34ae75884f70937e6bbe902125dd4077cd019f726f54cd820e8340d"
+python-versions = "==3.14.8"
+content-hash = "971f55645b71fff1fcb9dddbf2e91a27313be2b253abbc7c8e59ee7b5adb4df7"
