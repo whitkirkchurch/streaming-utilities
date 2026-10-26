@@ -18,7 +18,7 @@ rollbar = "1.5.0"
 pytz = "2025.2"
 churchsuite = {git = "https://github.com/whitkirkchurch/churchsuite-utilities.git", rev = "5f81512e67ccc34f59847548b45aa01cf2466fa5"}
 pytest = "9.1.1"
-pillow = "12.3.0"
+pillow = "13.0.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "7.16.2"
